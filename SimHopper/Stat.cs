@@ -96,7 +96,7 @@ namespace SimHopper
 
         public void Dump()
         {
-            string strSaveFilePath = "D:\\stat.txt";
+            string strSaveFilePath = "StatDump.txt";
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
             
             foreach (var e in _elements)
