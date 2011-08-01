@@ -99,6 +99,8 @@ namespace SimHopper
             string strSaveFilePath = "StatDump.txt";
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
             
+            writer.WriteLine("day\tprop eff\tprop earn\tscore eff\tscore earn\tpplns eff\tpplns earn\tpps earn\ttot eff\ttot earn");
+
             foreach (var e in _elements)
             {
                 var line = string.Format(
