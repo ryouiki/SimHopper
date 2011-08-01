@@ -21,7 +21,7 @@ namespace SimHopper
         private Stat _stat;
         private int _totalHop;
 
-        private int Difficulty = 1888786;
+        private int Difficulty = 1690906;
         private int MaxSimulationDay = 100;
         private int MaxSimulationRound = 200;
 
@@ -109,7 +109,7 @@ namespace SimHopper
 
         private void LoadRoundshares()
         {
-            string strSaveFilePath = "D:\\rand.txt";
+            string strSaveFilePath = "rand.txt";
             StreamReader reader = new StreamReader(strSaveFilePath, System.Text.Encoding.UTF8);
             string strFileLine = string.Empty;
             while ((strFileLine = reader.ReadLine()) != null)
@@ -129,7 +129,7 @@ namespace SimHopper
 
             if (_roundShares.Count == 0)
             {
-                _rnd.GenerateRoundShares(_roundShares, 50, 1690906);
+                _rnd.GenerateRoundShares(_roundShares, 50, (uint)Difficulty);
             }
 
             return target;
