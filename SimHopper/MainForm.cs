@@ -23,7 +23,7 @@ namespace SimHopper
 
         private int Difficulty = 1888786;
         private int MaxSimulationDay = 100;
-        private int MaxSimulationRound = 200;
+        private int MaxSimulationRound = 400;
         private int MaxSimulationGeneration = 1;
         private int InitialSimulationSpeedUp = 8192;
 
@@ -73,31 +73,44 @@ namespace SimHopper
 
             // simuation setup for the generation
 
+            {
+                // test threshold for time-slicing
+                MaxSimulationDay = 1000;
+                MaxSimulationRound = 100;
+                MaxSimulationGeneration = 20;
+                var threshold = 0.35f + 0.01f * _currentSimGeneration;
+                _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
+                _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
+                labelGeneration.Text = _currentGenerationTitle;
+
+                _currentStrategy = _currentGenerationTitle;
+            }
+
             //{
-            //    // test threshold for time-slicing
-            //    MaxSimulationDay = 500;
-            //    MaxSimulationRound = 20;
-            //    MaxSimulationGeneration = 10;
-            //    var threshold = 0.35f + 0.02f*_currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
+            //    // test thresholds for ryouiki's
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 20;
+            //    var threshold = 0.35f + 0.01f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
+            //    _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
             //    labelGeneration.Text = _currentGenerationTitle;
 
             //    _currentStrategy = _currentGenerationTitle;
             //}
 
-            { 
-                // test thresholds for ryouiki's
-                MaxSimulationDay = 1000;
-                MaxSimulationRound = 20;
-                MaxSimulationGeneration = 20;
-                var threshold = 0.35f + 0.01f * _currentSimGeneration;
-                _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
-                _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
-                labelGeneration.Text = _currentGenerationTitle;
+            //{
+            //    // test earlyhop factor for time-slicing
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 20;
+            //    var factor = 1.6f + 0.2f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("Flower_earlyFactor{0:0.00}", factor);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { EarliHopFactor = factor });
+            //    labelGeneration.Text = _currentGenerationTitle;
 
-                _currentStrategy = _currentGenerationTitle;
-            }
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
 
             _stat = new Stat(MaxSimulationDay);
             SetupRound();
