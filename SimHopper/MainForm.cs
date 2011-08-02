@@ -87,6 +87,32 @@ namespace SimHopper
             }
 
             //{
+            //    // time-slicing / selection type
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 1;
+            //    int selectType = _currentSimGeneration+3;
+            //    _currentGenerationTitle = string.Format("Flower_selType{0}", selectType);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SelectType = selectType });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
+
+            //{
+            //    // test threshold for time-slicing
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 20;
+            //    var powval = 1.4f + 0.1f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("Flower_pow{0:0.00}", powval);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { PowerValue = powval });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
+
+            //{
             //    // test threshold for time-slicing
             //    MaxSimulationDay = 1000;
             //    MaxSimulationRound = 100;
@@ -104,9 +130,22 @@ namespace SimHopper
             //    MaxSimulationDay = 1000;
             //    MaxSimulationRound = 100;
             //    MaxSimulationGeneration = 20;
-            //    var threshold = 0.35f + 0.01f * _currentSimGeneration;
+            //    var threshold = 0.30f + 0.02f * _currentSimGeneration;
             //    _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
             //    _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
+
+            //{
+            //    // test thresholds for roundtime
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 20;
+            //    var threshold = 0.30f + 0.02f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("RT_thr{0:0.00}", threshold);
+            //    _strategies.Add(_currentGenerationTitle, new MinRoundTime(Difficulty) { Threshold = threshold });
             //    labelGeneration.Text = _currentGenerationTitle;
 
             //    _currentStrategy = _currentGenerationTitle;
