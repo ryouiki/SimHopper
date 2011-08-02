@@ -29,6 +29,7 @@ namespace SimHopper
 
                     if (progress < Threshold && roundTime < minRoundTime)
                     {
+                        minRoundTime = roundTime;
                         best = pool.Key;
                     }
                 }
@@ -47,6 +48,7 @@ namespace SimHopper
 
                         if (progress < Threshold && roundTime < minRoundTime)
                         {
+                            minRoundTime = roundTime;
                             best = pool.Key;
                         }
                     }
@@ -66,6 +68,7 @@ namespace SimHopper
 
                         if (progress < Threshold && roundTime < minRoundTime)
                         {
+                            minRoundTime = roundTime;
                             best = pool.Key;
                         }
                     }
@@ -85,6 +88,7 @@ namespace SimHopper
 
                         if (progress < Threshold && roundTime < minRoundTime)
                         {
+                            minRoundTime = roundTime;
                             best = pool.Key;
                         }
                     }

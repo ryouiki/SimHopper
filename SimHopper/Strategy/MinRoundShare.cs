@@ -31,6 +31,7 @@ namespace SimHopper
 
                 if (progress < Threshold && progress < minProgress)
                 {
+                    minProgress = progress;
                     best = pool.Key;
                 }
             }
@@ -48,6 +49,7 @@ namespace SimHopper
 
                     if (progress < Threshold && progress < minProgress)
                     {
+                        minProgress = progress;
                         best = pool.Key;
                     }
                 }
@@ -66,6 +68,7 @@ namespace SimHopper
 
                     if (progress < Threshold && progress < minProgress)
                     {
+                        minProgress = progress;
                         best = pool.Key;
                     }
                 }
@@ -84,6 +87,7 @@ namespace SimHopper
 
                     if (progress < Threshold && progress < minProgress)
                     {
+                        minProgress = progress;
                         best = pool.Key;
                     }
                 }
