@@ -32,23 +32,45 @@ namespace SimHopper
             double totalWeight = 0;
             foreach (var pool in pools)
             {
-                if(pool.Value.Type != PoolType.Prop)
+                if(pool.Value.Type == PoolType.Smpps)
                 {
                     continue;
                 }
                 _slicedShare.Add(pool.Key, pool.Value.CurrentShare);
-                var w = 1.0/(pool.Value.CurrentShare + 1);
+                var modShare = pool.Value.CurrentShare+1;
+                switch (pool.Value.Type)
+                {
+                    case PoolType.Pplns:
+                        modShare *= 4.0f;
+                        break;
+                    case PoolType.Score:
+                        modShare *= 4.0f;
+                        break;
+                }
+
+                var w = 1.0 / modShare;
                 totalWeight += Math.Pow(w, 2.6);
             }
 
             var weight = SliceSize / totalWeight;
             foreach (var pool in pools)
             {
-                if (pool.Value.Type != PoolType.Prop)
+                if (pool.Value.Type == PoolType.Smpps)
                 {
                     continue;
                 }
-                var w = Math.Pow(1.0/(pool.Value.CurrentShare + 1), 2.6)*weight;
+                var modShare = pool.Value.CurrentShare+1;
+                switch (pool.Value.Type)
+                {
+                    case PoolType.Pplns:
+                        modShare *= 4.0f;
+                        break;
+                    case PoolType.Score:
+                        modShare *= 4.0f;
+                        break;
+                }
+
+                var w = Math.Pow(1.0 / modShare, 2.6) * weight;
                 w = w < 60.0 ? -1 : w;
                 _slice.Add(pool.Key, (int)w);
             }
@@ -78,10 +100,34 @@ namespace SimHopper
 
             foreach (var i in _slice)
             {
-                if(i.Value > 0)
+                if(i.Value > 0 && pools[i.Key].Type == PoolType.Prop)
                 {
                     best = i.Key;
                     break;
+                }
+            }
+
+            if (best == null)
+            {
+                foreach (var i in _slice)
+                {
+                    if (i.Value > 0 && pools[i.Key].Type == PoolType.Pplns)
+                    {
+                        best = i.Key;
+                        break;
+                    }
+                }
+            }
+
+            if (best == null)
+            {
+                foreach (var i in _slice)
+                {
+                    if (i.Value > 0 && pools[i.Key].Type == PoolType.Score)
+                    {
+                        best = i.Key;
+                        break;
+                    }
                 }
             }
 
