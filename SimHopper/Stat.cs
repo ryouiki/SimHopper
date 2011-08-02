@@ -24,7 +24,7 @@ namespace SimHopper
         public StatElement(int day, double propEff, double propEarn,
             double scoreEff, double scoreEarn,
             double pplnsEff, double pplnsEarn,
-            double smppsEarn, double totalEff, double totalEarn)
+            double smppsEarn, double totalEff, double totalEarn, double totalHop)
         {
             Day = day;
             PropEff = propEff;
@@ -36,6 +36,7 @@ namespace SimHopper
             SMPPSEarn = smppsEarn;
             TotalEff = totalEff;
             TotalEarn = totalEarn;
+            TotalHop = totalHop;
         }
 
         public int Day { get; set; }
@@ -53,6 +54,8 @@ namespace SimHopper
 
         public double TotalEff { get; set; }
         public double TotalEarn { get; set; }
+
+        public double TotalHop { get; set; }
     }
 
     public class Stat
@@ -91,6 +94,7 @@ namespace SimHopper
             _elements[day].SMPPSEarn = (prior.SMPPSEarn * _dayAccumulated[day] + e.SMPPSEarn) / (_dayAccumulated[day] + 1);
             _elements[day].TotalEff = (prior.TotalEff * _dayAccumulated[day] + e.TotalEff) / (_dayAccumulated[day] + 1);
             _elements[day].TotalEarn = (prior.TotalEarn * _dayAccumulated[day] + e.TotalEarn) / (_dayAccumulated[day] + 1);
+            _elements[day].TotalHop = (prior.TotalHop * _dayAccumulated[day] + e.TotalHop) / (_dayAccumulated[day] + 1);
 
             _dayAccumulated[day] = _dayAccumulated[day] + 1;
         }
@@ -100,7 +104,7 @@ namespace SimHopper
             string strSaveFilePath = "StatDump.txt";
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
             
-            writer.WriteLine("day\tprop eff\tprop earn\tscore eff\tscore earn\tpplns eff\tpplns earn\tpps earn\ttot eff\ttot earn");
+            writer.WriteLine("day\tprop eff\tprop earn\tscore eff\tscore earn\tpplns eff\tpplns earn\tpps earn\ttot eff\ttot earn\tHops");
 
             var maxAccumulation = 0;
             foreach (var acc in _dayAccumulated.Where(acc => maxAccumulation < acc))
@@ -115,9 +119,9 @@ namespace SimHopper
 
                 var e = _elements[i];
                 var line = string.Format(
-                        "{0}\t{1:0.0000}\t{2:0.0000}\t{3:0.0000}\t{4:0.0000}\t{5:0.0000}\t{6:0.0000}\t{7:0.0000}\t{8:0.0000}\t{9:0.0000}",
+                        "{0}\t{1:0.0000}\t{2:0.0000}\t{3:0.0000}\t{4:0.0000}\t{5:0.0000}\t{6:0.0000}\t{7:0.0000}\t{8:0.0000}\t{9:0.0000}\t{10:0.0}",
                         e.Day, e.PropEff, e.PropEarn, e.ScoreEff, e.ScoreEarn, e.PPLNSEff, e.PPLNSEarn, e.SMPPSEarn,
-                        e.TotalEff, e.TotalEarn
+                        e.TotalEff, e.TotalEarn, e.TotalHop
                         );
 
                 writer.WriteLine(line);

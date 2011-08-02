@@ -290,7 +290,7 @@ namespace SimHopper
             var totalEarn = propEarn + pplnsEarn + scoreEarn + smppsEarn;
 
             var stat = new StatElement(days, propEff, propEarn, scoreEff, scoreEarn, pplnsEff, pplnsEarn, smppsEarn,
-                                       totalEff, totalEarn);
+                                       totalEff, totalEarn, _totalHop);
             _stat.AddStat(stat);
 
             if (days > MaxSimulationDay)
