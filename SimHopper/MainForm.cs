@@ -38,31 +38,42 @@ namespace SimHopper
         {
             InitializeComponent();
 
-            var seed = (uint)DateTime.Now.Ticks;
-            _rnd = new MersenneTwister(seed);
-            _stat = new Stat(MaxSimulationDay);
-            _strategies = new Dictionary<string, IHopStrategy>();
-            
-            _strategies.Add("MinRoundShare", new MinRoundShare(Difficulty));
-            _strategies.Add("MinRoundTime", new MinRoundTime(Difficulty));
-            _strategies.Add("RouletteRoundShare", new RouletteRoundShare(Difficulty));
-            _strategies.Add("RouletteRoundShare2", new RouletteRoundShare2(Difficulty));
-            _strategies.Add("MinRTMTDP", new MinRTMTDP(Difficulty));
-            _strategies.Add("Flower_2400", new Flower(Difficulty) { SliceSize = 2400.0 });
-            _strategies.Add("Flower_1200", new Flower(Difficulty) {SliceSize = 1200.0});
-            _strategies.Add("Flower_600", new Flower(Difficulty) { SliceSize = 600.0 });
-            _strategies.Add("Flower_300", new Flower(Difficulty) { SliceSize = 300.0 });
-
-            _currentStrategy = "Flower_1200";
-            Initialize();
+            InitializeSimutlator();
         }
 
-        public void Initialize()
+        public void InitializeSimutlator()
+        {
+            var seed = (uint)DateTime.Now.Ticks;
+            _rnd = new MersenneTwister(seed);
+            SetupSimulation();
+        }
+
+        public void SetupSimulation()
+        {
+            _stat = new Stat(MaxSimulationDay);
+            _strategies = new Dictionary<string, IHopStrategy>
+                              {
+                                  {"MinRoundShare", new MinRoundShare(Difficulty)},
+                                  {"MinRoundTime", new MinRoundTime(Difficulty)},
+                                  {"RouletteRoundShare", new RouletteRoundShare(Difficulty)},
+                                  {"RouletteRoundShare2", new RouletteRoundShare2(Difficulty)},
+                                  {"MinRTMTDP", new MinRTMTDP(Difficulty)},
+                                  {"Flower_2400", new Flower(Difficulty) {SliceSize = 2400.0}},
+                                  {"Flower_1200", new Flower(Difficulty) {SliceSize = 1200.0}},
+                                  {"Flower_600", new Flower(Difficulty) {SliceSize = 600.0}},
+                                  {"Flower_300", new Flower(Difficulty) {SliceSize = 300.0}}
+                              };
+
+            _currentStrategy = "Flower_300";
+            SetupSimulationRound();
+        }
+
+        public void SetupSimulationRound()
         {
             _roundShares = new List<int>();
             _servers.Clear();
-            _elapsedTime = 0;
             _results.Clear();
+            _elapsedTime = 0;
             _totalHop = 0;
             _currentServer = "";
             ++_currentSimRound;
@@ -73,12 +84,6 @@ namespace SimHopper
 
             _advPerTick = Convert.ToInt32(labelAdvPerTick.Text);
             _toLog = true;
-
-            //double avr = 0.0;
-            //foreach (var val in _roundShares)
-            //{
-            //    avr += (double)val / _roundShares.Count;
-            //}
 
             _servers.Add("mtred", new PoolServer("mtred", PoolType.Prop, 350, -1, 300, 8.18f, GetNextTarget));
             _servers.Add("polmine", new PoolServer("polmine", PoolType.Prop, 130, -1, 300, 6.7f, GetNextTarget));
@@ -299,7 +304,7 @@ namespace SimHopper
                 {
                     var log = string.Format("{0:0.0} / {1:0.0} / {2:0.0} : / {3:0.0} | {4:0.000} BTC/day\n", propEff, pplnsEff, scoreEff, totalEff, totalEarn / (_elapsedTime / 86400.0));
                     PrintLog(log);
-                    _stat.Dump();
+                    _stat.Dump(false);
                     _toLog = false;
                 }
 
@@ -309,10 +314,11 @@ namespace SimHopper
                 {
                     if (_currentSimRound < MaxSimulationRound)
                     {
-                        Initialize();
+                        SetupSimulationRound();
                     }
                     else
                     {
+                        _stat.Dump(true);
                         checkBoxAuto.Checked = false;
                     }
                 }
@@ -348,7 +354,7 @@ namespace SimHopper
 
         private void buttonRestart_Click(object sender, EventArgs e)
         {
-            Initialize();
+            SetupSimulationRound();
         }
     }
 
