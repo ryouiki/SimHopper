@@ -38,7 +38,8 @@ namespace SimHopper
                     Profit = (float)ValidShare * 50.0f / (float)FinalShare;
                     break;
                 case PoolType.Pplns:
-                    Profit = (float)ValidShare * 50.0f / (int)(FinalShare / 2);
+                    var f = (int) (FinalShare/2);
+                    Profit = f > 0 ? (float) ValidShare*50.0f/f : 0;
                     break;
                 case PoolType.Score:
                     Profit = (float)ValidShare * 50.0f / (float)FinalShare;
