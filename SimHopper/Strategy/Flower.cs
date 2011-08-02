@@ -57,7 +57,7 @@ namespace SimHopper
                 totalWeight += Math.Pow(w, 2.6);
             }
 
-            var weight = SliceSize / totalWeight;
+            var weight = SliceSize/(totalWeight + 0.00000001);
             foreach (var pool in pools)
             {
                 if (pool.Value.Type == PoolType.Smpps)
