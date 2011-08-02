@@ -68,10 +68,10 @@ namespace SimHopper
                 switch (pool.Value.Type)
                 {
                     case PoolType.Pplns:
-                        modShare *= 4.0f;
+                        modShare *= PPLNSFactor;
                         break;
                     case PoolType.Score:
-                        modShare *= 4.0f;
+                        modShare *= ScoreFactor;
                         break;
                 }
 
