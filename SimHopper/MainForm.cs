@@ -22,7 +22,7 @@ namespace SimHopper
         private int _totalHop;
 
         private int Difficulty = 1888786;
-        private int MaxSimulationDay = 200;
+        private int MaxSimulationDay = 500;
         private int MaxSimulationRound = 50;
         private int MaxSimulationGeneration = 100;
         private int InitialSimulationSpeedUp = 8192;
@@ -74,7 +74,7 @@ namespace SimHopper
 
             // simuation setup for the generation
             {
-                var factor = 0.2f + 0.02f*_currentSimGeneration;
+                var factor = 2.0f + 0.02f*_currentSimGeneration;
                 _currentGenerationTitle = string.Format("Flower_1200_pplns{0:0.00}", factor);
                 _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SliceSize = 1200.0, PPLNSFactor = factor });
                 labelGeneration.Text = _currentGenerationTitle;
@@ -124,7 +124,7 @@ namespace SimHopper
             _servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
             _servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
 
-            //_servers.Add("btcg", new PoolServer("btcg", PoolType.Pplns, 2500, -1, 3600, 8.1f, GetNextTarget));
+            _servers.Add("btcg", new PoolServer("btcg", PoolType.Pplns, 2500, -1, 3600, 8.1f, GetNextTarget));
 
             //_servers.Add("btcserv", new PoolServer("btcserv", PoolType.Prop, 5, -1, 60, 5.0f, GetNextTarget));
 
