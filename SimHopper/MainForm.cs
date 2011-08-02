@@ -22,8 +22,10 @@ namespace SimHopper
         private int _totalHop;
 
         private int Difficulty = 1888786;
-        private int MaxSimulationDay = 100;
-        private int MaxSimulationRound = 200;
+        private int MaxSimulationDay = 200;
+        private int MaxSimulationRound = 50;
+        private int MaxSimulationGeneration = 100;
+        private int InitialSimulationSpeedUp = 8192;
 
         private Dictionary<string, PoolServer> _servers = new Dictionary<string, PoolServer>();
         private List<RoundResult> _results = new List<RoundResult>();
@@ -33,6 +35,8 @@ namespace SimHopper
         private string _currentServer = "";
         private int _advPerTick = 1;
         private int _currentSimRound = 0;
+        private int _currentSimGeneration = 0;
+        private string _currentGenerationTitle = "";
 
         public MainForm()
         {
@@ -45,11 +49,15 @@ namespace SimHopper
         {
             var seed = (uint)DateTime.Now.Ticks;
             _rnd = new MersenneTwister(seed);
-            SetupSimulation();
+            _currentSimGeneration = 0;
+            labelAdvPerTick.Text = InitialSimulationSpeedUp.ToString();
+            SetupGeneration();
         }
 
-        public void SetupSimulation()
+        public void SetupGeneration()
         {
+            ++_currentSimGeneration;
+            _currentSimRound = 0;
             _stat = new Stat(MaxSimulationDay);
             _strategies = new Dictionary<string, IHopStrategy>
                               {
@@ -64,11 +72,32 @@ namespace SimHopper
                                   {"Flower_300", new Flower(Difficulty) {SliceSize = 300.0}}
                               };
 
-            _currentStrategy = "Flower_300";
-            SetupSimulationRound();
+            // simuation setup for the generation
+            {
+                var factor = 0.2f + 0.02f*_currentSimGeneration;
+                _currentGenerationTitle = string.Format("Flower_1200_pplns{0:0.00}", factor);
+                _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SliceSize = 1200.0, PPLNSFactor = factor });
+                labelGeneration.Text = _currentGenerationTitle;
+
+                _currentStrategy = _currentGenerationTitle;
+            }
+
+            SetupRound();
         }
 
-        public void SetupSimulationRound()
+        public void FinishSimGeneration()
+        {
+            if (_currentSimGeneration< MaxSimulationGeneration)
+            {
+                SetupGeneration();
+            }
+            else
+            {
+                checkBoxAuto.Checked = false;
+            }
+        }
+
+        public void SetupRound()
         {
             _roundShares = new List<int>();
             _servers.Clear();
@@ -304,7 +333,7 @@ namespace SimHopper
                 {
                     var log = string.Format("{0:0.0} / {1:0.0} / {2:0.0} : / {3:0.0} | {4:0.000} BTC/day\n", propEff, pplnsEff, scoreEff, totalEff, totalEarn / (_elapsedTime / 86400.0));
                     PrintLog(log);
-                    _stat.Dump(false);
+                    _stat.Dump(_currentGenerationTitle, false);
                     _toLog = false;
                 }
 
@@ -314,12 +343,12 @@ namespace SimHopper
                 {
                     if (_currentSimRound < MaxSimulationRound)
                     {
-                        SetupSimulationRound();
+                        SetupRound();
                     }
                     else
                     {
-                        _stat.Dump(true);
-                        checkBoxAuto.Checked = false;
+                        _stat.Dump(_currentGenerationTitle, true);
+                        FinishSimGeneration();
                     }
                 }
             }
@@ -354,7 +383,7 @@ namespace SimHopper
 
         private void buttonRestart_Click(object sender, EventArgs e)
         {
-            SetupSimulationRound();
+            SetupRound();
         }
     }
 

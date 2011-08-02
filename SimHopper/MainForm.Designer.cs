@@ -51,6 +51,7 @@
             this.checkBoxAuto = new System.Windows.Forms.CheckBox();
             this.labelSimulRound = new System.Windows.Forms.Label();
             this.labelHop = new System.Windows.Forms.Label();
+            this.labelGeneration = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelCurrentPool
@@ -207,7 +208,7 @@
             // 
             // buttonRestart
             // 
-            this.buttonRestart.Location = new System.Drawing.Point(341, 89);
+            this.buttonRestart.Location = new System.Drawing.Point(341, 95);
             this.buttonRestart.Name = "buttonRestart";
             this.buttonRestart.Size = new System.Drawing.Size(131, 23);
             this.buttonRestart.TabIndex = 12;
@@ -232,17 +233,17 @@
             this.checkBoxAuto.AutoSize = true;
             this.checkBoxAuto.Checked = true;
             this.checkBoxAuto.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxAuto.Location = new System.Drawing.Point(349, 72);
+            this.checkBoxAuto.Location = new System.Drawing.Point(349, 78);
             this.checkBoxAuto.Name = "checkBoxAuto";
-            this.checkBoxAuto.Size = new System.Drawing.Size(92, 16);
+            this.checkBoxAuto.Size = new System.Drawing.Size(75, 16);
             this.checkBoxAuto.TabIndex = 14;
-            this.checkBoxAuto.Text = "Auto Restart";
+            this.checkBoxAuto.Text = "Auto Run";
             this.checkBoxAuto.UseVisualStyleBackColor = true;
             // 
             // labelSimulRound
             // 
             this.labelSimulRound.AutoSize = true;
-            this.labelSimulRound.Location = new System.Drawing.Point(347, 57);
+            this.labelSimulRound.Location = new System.Drawing.Point(347, 63);
             this.labelSimulRound.Name = "labelSimulRound";
             this.labelSimulRound.Size = new System.Drawing.Size(114, 12);
             this.labelSimulRound.TabIndex = 15;
@@ -257,11 +258,21 @@
             this.labelHop.TabIndex = 16;
             this.labelHop.Text = "Hop : ";
             // 
+            // labelGeneration
+            // 
+            this.labelGeneration.AutoSize = true;
+            this.labelGeneration.Location = new System.Drawing.Point(347, 48);
+            this.labelGeneration.Name = "labelGeneration";
+            this.labelGeneration.Size = new System.Drawing.Size(94, 12);
+            this.labelGeneration.TabIndex = 17;
+            this.labelGeneration.Text = "Generation Title";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(522, 405);
+            this.Controls.Add(this.labelGeneration);
             this.Controls.Add(this.labelHop);
             this.Controls.Add(this.labelSimulRound);
             this.Controls.Add(this.checkBoxAuto);
@@ -314,6 +325,7 @@
         private System.Windows.Forms.CheckBox checkBoxAuto;
         private System.Windows.Forms.Label labelSimulRound;
         private System.Windows.Forms.Label labelHop;
+        private System.Windows.Forms.Label labelGeneration;
     }
 }
 

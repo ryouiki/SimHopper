@@ -99,12 +99,12 @@ namespace SimHopper
             _dayAccumulated[day] = _dayAccumulated[day] + 1;
         }
 
-        public void Dump(bool toAddSimulationTime)
+        public void Dump(string generationTitle, bool toAddSimulationTime)
         {
-            string strSaveFilePath = "StatDump.txt";
+            string strSaveFilePath = "StatDump_" + generationTitle + ".txt";
             if (toAddSimulationTime)
             {
-                strSaveFilePath = "StatDump" + string.Format("{0:yyyyMMMdd-HHmmss}",DateTime.Now) + ".txt";
+                strSaveFilePath = "StatDump_" + generationTitle + string.Format("_{0:yyyyMMMdd-HHmmss}", DateTime.Now) + ".txt";
             }
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
             
