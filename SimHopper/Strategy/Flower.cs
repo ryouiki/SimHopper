@@ -10,6 +10,8 @@ namespace SimHopper
         private readonly int _difficulty;
 
         public double SliceSize { get; set; }
+        public float PPLNSFactor { get; set; }
+        public float ScoreFactor { get; set; }
 
         private MersenneTwister _rnd;
         
@@ -18,6 +20,9 @@ namespace SimHopper
 
         public Flower(int difficulty)
         {
+            SliceSize = 1200;           // default
+            PPLNSFactor = 4.0f;          // default
+            ScoreFactor = 4.0f;          // default
             _difficulty = difficulty;
             _rnd = new MersenneTwister((uint)DateTime.Now.Ticks);
             _slicedShare = new Dictionary<string, float>();
@@ -41,10 +46,10 @@ namespace SimHopper
                 switch (pool.Value.Type)
                 {
                     case PoolType.Pplns:
-                        modShare *= 4.0f;
+                        modShare *= PPLNSFactor;
                         break;
                     case PoolType.Score:
-                        modShare *= 4.0f;
+                        modShare *= ScoreFactor;
                         break;
                 }
 
