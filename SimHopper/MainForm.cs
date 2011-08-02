@@ -74,17 +74,30 @@ namespace SimHopper
             // simuation setup for the generation
 
             {
-                // test threshold for time-slicing
+                // test threshold for MinRoundShare
                 MaxSimulationDay = 1000;
                 MaxSimulationRound = 100;
                 MaxSimulationGeneration = 20;
                 var threshold = 0.35f + 0.01f * _currentSimGeneration;
-                _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
-                _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
+                _currentGenerationTitle = string.Format("RS_thr{0:0.00}", threshold);
+                _strategies.Add(_currentGenerationTitle, new MinRoundShare(Difficulty) { Threshold = threshold });
                 labelGeneration.Text = _currentGenerationTitle;
 
                 _currentStrategy = _currentGenerationTitle;
             }
+
+            //{
+            //    // test threshold for time-slicing
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 20;
+            //    var threshold = 0.35f + 0.01f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
 
             //{
             //    // test thresholds for ryouiki's
