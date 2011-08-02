@@ -4,11 +4,13 @@ namespace SimHopper
 {
     public class MinRoundTime : IHopStrategy
     {
+        public float Threshold { get; set; }
         private readonly int _difficulty;
 
         public MinRoundTime(int difficulty)
         {
             _difficulty = difficulty;
+            Threshold = 0.43f;
         }
 
         public string GetBestPool(Dictionary<string, PoolServer> pools, string currentPool, int advancedSeconds)
@@ -25,7 +27,7 @@ namespace SimHopper
                     var progress = (float)pool.Value.CurrentShare / _difficulty;
                     var roundTime = pool.Value.RoundTime;
 
-                    if (progress < 0.43f && roundTime < minRoundTime)
+                    if (progress < Threshold && roundTime < minRoundTime)
                     {
                         best = pool.Key;
                     }
@@ -43,7 +45,7 @@ namespace SimHopper
 
                         progress *= 4.0f;
 
-                        if (progress < 0.43f && roundTime < minRoundTime)
+                        if (progress < Threshold && roundTime < minRoundTime)
                         {
                             best = pool.Key;
                         }
@@ -62,7 +64,7 @@ namespace SimHopper
 
                         progress *= 4.0f;
 
-                        if (progress < 0.43f && roundTime < minRoundTime)
+                        if (progress < Threshold && roundTime < minRoundTime)
                         {
                             best = pool.Key;
                         }
@@ -80,8 +82,8 @@ namespace SimHopper
                         var roundTime = pool.Value.RoundTime;
 
                         progress *= 4.0f;
-                        
-                        if (progress < 0.43f && roundTime < minRoundTime)
+
+                        if (progress < Threshold && roundTime < minRoundTime)
                         {
                             best = pool.Key;
                         }

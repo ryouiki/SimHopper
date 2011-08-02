@@ -7,6 +7,7 @@ namespace SimHopper
 {
     public class RouletteRoundShare2 : IHopStrategy
     {
+        public float Threshold { get; set; }
         private readonly int _difficulty;
         private const int MaxRouletteDelay = 20;
         private int _currentRouletteDelay = 0;
@@ -16,6 +17,7 @@ namespace SimHopper
         {
             _difficulty = difficulty;
             _rnd = new MersenneTwister((uint)DateTime.Now.Ticks);
+            Threshold = 0.43f;
         }
 
         public string GetBestPool(Dictionary<string, PoolServer> pools, string currentPool, int advancedSeconds)
@@ -35,7 +37,7 @@ namespace SimHopper
             }
 
             var sharePropPools = pools
-                .Where(pool => pool.Value.Type == PoolType.Prop && pool.Value.CurrentShare < _difficulty * 0.43)
+                .Where(pool => pool.Value.Type == PoolType.Prop && pool.Value.CurrentShare < _difficulty * Threshold)
                 .ToDictionary(pool => pool.Key, pool =>
                                                     {
                                                         var d = (double)_difficulty / (pool.Value.CurrentShare);
@@ -45,7 +47,7 @@ namespace SimHopper
             if (sharePropPools.Count == 0)
             {
                 sharePropPools = pools
-                    .Where(pool => pool.Value.Type == PoolType.PropEarlyHop && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
+                    .Where(pool => pool.Value.Type == PoolType.PropEarlyHop && pool.Value.CurrentShare * 4.0 < _difficulty * Threshold)
                     .ToDictionary(pool => pool.Key, pool =>
                     {
                         var d = (double)_difficulty / (pool.Value.CurrentShare);
@@ -56,7 +58,7 @@ namespace SimHopper
             if (sharePropPools.Count == 0)
             {
                 sharePropPools = pools
-                    .Where(pool => pool.Value.Type == PoolType.Pplns && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
+                    .Where(pool => pool.Value.Type == PoolType.Pplns && pool.Value.CurrentShare * 4.0 < _difficulty * Threshold)
                     .ToDictionary(pool => pool.Key, pool =>
                                                         {
                                                             var d = (double)_difficulty / (pool.Value.CurrentShare);
@@ -67,7 +69,7 @@ namespace SimHopper
             if (sharePropPools.Count == 0)
             {
                 sharePropPools = pools
-                    .Where(pool => pool.Value.Type == PoolType.Score && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
+                    .Where(pool => pool.Value.Type == PoolType.Score && pool.Value.CurrentShare * 4.0 < _difficulty * Threshold)
                     .ToDictionary(pool => pool.Key, pool =>
                     {
                         var d = (double)_difficulty / (pool.Value.CurrentShare);

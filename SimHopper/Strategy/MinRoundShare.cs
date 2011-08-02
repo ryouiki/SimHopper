@@ -4,11 +4,13 @@ namespace SimHopper
 {
     public class MinRoundShare : IHopStrategy
     {
+        public float Threshold { get; set; }
         private readonly int _difficulty;
 
         public MinRoundShare(int difficulty)
         {
             _difficulty = difficulty;
+            Threshold = 0.43f;
         }
 
         public string GetBestPool(Dictionary<string, PoolServer> pools, string currentPool, int advancedSeconds)
@@ -27,7 +29,7 @@ namespace SimHopper
                     progress = (float)pool.Value.CurrentShare / _difficulty;
                 }
 
-                if (progress < 0.43f && progress < minProgress)
+                if (progress < Threshold && progress < minProgress)
                 {
                     best = pool.Key;
                 }
@@ -44,7 +46,7 @@ namespace SimHopper
                         progress *= 4.0f;
                     }
 
-                    if (progress < 0.43f && progress < minProgress)
+                    if (progress < Threshold && progress < minProgress)
                     {
                         best = pool.Key;
                     }
@@ -62,7 +64,7 @@ namespace SimHopper
                         progress *= 4.0f;
                     }
 
-                    if (progress < 0.43f && progress < minProgress)
+                    if (progress < Threshold && progress < minProgress)
                     {
                         best = pool.Key;
                     }
@@ -80,7 +82,7 @@ namespace SimHopper
                         progress *= 4.0f;
                     }
 
-                    if (progress < 0.43f && progress < minProgress)
+                    if (progress < Threshold && progress < minProgress)
                     {
                         best = pool.Key;
                     }
