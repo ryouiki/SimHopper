@@ -21,7 +21,7 @@ namespace SimHopper
         private Stat _stat;
         private int _totalHop;
 
-        private int Difficulty = 1690906;
+        private int Difficulty = 1888786;
         private int MaxSimulationDay = 100;
         private int MaxSimulationRound = 200;
 
@@ -53,7 +53,7 @@ namespace SimHopper
             _strategies.Add("Flower_600", new Flower(Difficulty) { SliceSize = 600.0 });
             _strategies.Add("Flower_300", new Flower(Difficulty) { SliceSize = 300.0 });
 
-            _currentStrategy = "Flower_300";
+            _currentStrategy = "Flower_1200";
             Initialize();
         }
 
@@ -90,15 +90,17 @@ namespace SimHopper
             _servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
             _servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
 
-            //_servers.Add("btcserv", new PoolServer("btcserv", PoolType.Prop, 5, -1, GetNextTarget));
+            //_servers.Add("btcg", new PoolServer("btcg", PoolType.Pplns, 2500, -1, 3600, 8.1f, GetNextTarget));
 
-            //_servers.Add("mini-1", new PoolServer("mini-1", PoolType.Prop, 8, -1, GetNextTarget));
-            //_servers.Add("mini-2", new PoolServer("mini-2", PoolType.Prop, 8, -1, GetNextTarget));
+            //_servers.Add("btcserv", new PoolServer("btcserv", PoolType.Prop, 5, -1, 60, 5.0f, GetNextTarget));
 
-            //_servers.Add("tiny-1", new PoolServer("tiny-1", PoolType.Prop, 2, -1, GetNextTarget));
-            //_servers.Add("tiny-2", new PoolServer("tiny-2", PoolType.Prop, 2, -1, GetNextTarget));
-            //_servers.Add("tiny-3", new PoolServer("tiny-3", PoolType.Prop, 2, -1, GetNextTarget));
-            //_servers.Add("tiny-4", new PoolServer("tiny-4", PoolType.Prop, 2, -1, GetNextTarget));
+            //_servers.Add("mini-1", new PoolServer("mini-1", PoolType.Prop, 8, -1, 60, 5.0f, GetNextTarget));
+            //_servers.Add("mini-2", new PoolServer("mini-2", PoolType.Prop, 8, -1, 60, 5.0f, GetNextTarget));
+
+            //_servers.Add("tiny-1", new PoolServer("tiny-1", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
+            //_servers.Add("tiny-2", new PoolServer("tiny-2", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
+            //_servers.Add("tiny-3", new PoolServer("tiny-3", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
+            //_servers.Add("tiny-4", new PoolServer("tiny-4", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
 
             //_servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, -1, 60, 8.13f, GetNextTarget));
             //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
