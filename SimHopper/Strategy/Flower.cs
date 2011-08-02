@@ -42,6 +42,13 @@ namespace SimHopper
             double totalWeight = 0;
             foreach (var pool in pools)
             {
+                if (pool.Value.Type == PoolType.Smpps)
+                {
+                    continue;
+                }
+
+                _slicedShare.Add(pool.Key, pool.Value.CurrentShare);
+
                 var modShare = pool.Value.CurrentShare + 1;
                 switch (pool.Value.Type)
                 {
@@ -56,13 +63,11 @@ namespace SimHopper
                         break;
                 }
 
-                if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty * Threshold)
+                if (modShare > _difficulty * Threshold)
                 {
                     continue;
                 }
-                
-                _slicedShare.Add(pool.Key, pool.Value.CurrentShare);
-                
+
                 var w = 1.0 / modShare;
                 totalWeight += Math.Pow(w, 2.6);
             }
@@ -72,6 +77,11 @@ namespace SimHopper
                 var weight = SliceSize / totalWeight;
                 foreach (var pool in pools)
                 {
+                    if (pool.Value.Type == PoolType.Smpps)
+                    {
+                        continue;
+                    }
+
                     var modShare = pool.Value.CurrentShare + 1;
                     switch (pool.Value.Type)
                     {
@@ -86,7 +96,7 @@ namespace SimHopper
                             break;
                     }
 
-                    if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty * Threshold)
+                    if (modShare > _difficulty * Threshold)
                     {
                         continue;
                     }
@@ -113,29 +123,11 @@ namespace SimHopper
             }
             else
             {
-                bool toReslice = false;
-                foreach (var s in _slicedShare)
+                bool toReslice = _slicedShare.Any(s => s.Value > pools[s.Key].CurrentShare);
+                if (toReslice)
                 {
-                    var modShare = pools[s.Key].CurrentShare + 1;
-                    switch(pools[s.Key].Type)
-                    {
-                        case PoolType.PropEarlyHop:
-                            modShare *= EarliHopFactor;
-                            break;
-                        case PoolType.Pplns:
-                            modShare *= PPLNSFactor;
-                            break;
-                        case PoolType.Score:
-                            modShare *= ScoreFactor;
-                            break;
-                    }
-                    if (s.Value > modShare)
-                    {
-                        toReslice = true;
-                        break;
-                    }
+                    Reslice(pools);
                 }
-                if (toReslice) Reslice(pools);
             }
 
             foreach (var i in _slice)
