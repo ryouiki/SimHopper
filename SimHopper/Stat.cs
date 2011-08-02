@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SimHopper
 {
@@ -101,13 +102,23 @@ namespace SimHopper
             
             writer.WriteLine("day\tprop eff\tprop earn\tscore eff\tscore earn\tpplns eff\tpplns earn\tpps earn\ttot eff\ttot earn");
 
-            foreach (var e in _elements)
+            var maxAccumulation = 0;
+            foreach (var acc in _dayAccumulated.Where(acc => maxAccumulation < acc))
             {
+                maxAccumulation = acc;
+            }
+
+            for (int i = 0; i < _elements.Length;++i )
+            {
+                if (_dayAccumulated[i] < maxAccumulation * 0.5) // skip unstable result
+                    continue;
+
+                var e = _elements[i];
                 var line = string.Format(
-                    "{0}\t{1:0.0000}\t{2:0.0000}\t{3:0.0000}\t{4:0.0000}\t{5:0.0000}\t{6:0.0000}\t{7:0.0000}\t{8:0.0000}\t{9:0.0000}",
-                    e.Day,e.PropEff,e.PropEarn, e.ScoreEff,e.ScoreEarn,e.PPLNSEff,e.PPLNSEarn, e.SMPPSEarn,
-                    e.TotalEff,e.TotalEarn
-                    );
+                        "{0}\t{1:0.0000}\t{2:0.0000}\t{3:0.0000}\t{4:0.0000}\t{5:0.0000}\t{6:0.0000}\t{7:0.0000}\t{8:0.0000}\t{9:0.0000}",
+                        e.Day, e.PropEff, e.PropEarn, e.ScoreEff, e.ScoreEarn, e.PPLNSEff, e.PPLNSEarn, e.SMPPSEarn,
+                        e.TotalEff, e.TotalEarn
+                        );
 
                 writer.WriteLine(line);
             }
