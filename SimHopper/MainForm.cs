@@ -22,9 +22,9 @@ namespace SimHopper
         private int _totalHop;
 
         private int Difficulty = 1888786;
-        private int MaxSimulationDay = 500;
-        private int MaxSimulationRound = 50;
-        private int MaxSimulationGeneration = 100;
+        private int MaxSimulationDay = 100;
+        private int MaxSimulationRound = 200;
+        private int MaxSimulationGeneration = 1;
         private int InitialSimulationSpeedUp = 8192;
 
         private Dictionary<string, PoolServer> _servers = new Dictionary<string, PoolServer>();
@@ -58,7 +58,6 @@ namespace SimHopper
         {
             ++_currentSimGeneration;
             _currentSimRound = 0;
-            _stat = new Stat(MaxSimulationDay);
             _strategies = new Dictionary<string, IHopStrategy>
                               {
                                   {"MinRoundShare", new MinRoundShare(Difficulty)},
@@ -73,15 +72,34 @@ namespace SimHopper
                               };
 
             // simuation setup for the generation
-            {
-                var factor = 2.0f + 0.02f*_currentSimGeneration;
-                _currentGenerationTitle = string.Format("Flower_1200_pplns{0:0.00}", factor);
-                _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SliceSize = 1200.0, PPLNSFactor = factor });
+
+            //{
+            //    // test threshold for time-slicing
+            //    MaxSimulationDay = 500;
+            //    MaxSimulationRound = 20;
+            //    MaxSimulationGeneration = 10;
+            //    var threshold = 0.35f + 0.02f*_currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
+
+            { 
+                // test thresholds for ryouiki's
+                MaxSimulationDay = 1000;
+                MaxSimulationRound = 20;
+                MaxSimulationGeneration = 20;
+                var threshold = 0.35f + 0.01f * _currentSimGeneration;
+                _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
+                _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
                 labelGeneration.Text = _currentGenerationTitle;
 
                 _currentStrategy = _currentGenerationTitle;
             }
 
+            _stat = new Stat(MaxSimulationDay);
             SetupRound();
         }
 
@@ -116,7 +134,7 @@ namespace SimHopper
 
             _servers.Add("mtred", new PoolServer("mtred", PoolType.Prop, 350, -1, 300, 8.18f, GetNextTarget));
             _servers.Add("polmine", new PoolServer("polmine", PoolType.Prop, 130, -1, 300, 6.7f, GetNextTarget));
-            //_servers.Add("bitclockers", new PoolServer("bitclockers", PoolType.Prop, 233, -1, 60, 5.0f, GetNextTarget));
+            _servers.Add("bitclockers", new PoolServer("bitclockers", PoolType.Prop, 233, -1, 60, 5.0f, GetNextTarget));
             _servers.Add("rfcpool", new PoolServer("rfcpool", PoolType.Prop, 90, -1, 60, 2.1f, GetNextTarget));
             _servers.Add("triplemining", new PoolServer("triplemining", PoolType.Prop, 72, -1, 60, 7.6f, GetNextTarget));
             _servers.Add("ozco", new PoolServer("ozco", PoolType.Prop, 122, -1, 60, 8.52f, GetNextTarget));
@@ -124,7 +142,7 @@ namespace SimHopper
             _servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
             _servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
 
-            _servers.Add("btcg", new PoolServer("btcg", PoolType.Pplns, 2500, -1, 3600, 8.1f, GetNextTarget));
+            //_servers.Add("btcg", new PoolServer("btcg", PoolType.PropEarlyHop, 2500, -1, 3600, 8.1f, GetNextTarget));
 
             //_servers.Add("btcserv", new PoolServer("btcserv", PoolType.Prop, 5, -1, 60, 5.0f, GetNextTarget));
 
@@ -233,7 +251,7 @@ namespace SimHopper
             // print current info
             double pps = 50.0f / Difficulty;
             var pool = _servers[_currentServer];
-            if (pool.Type == PoolType.Prop)
+            if (pool.Type == PoolType.Prop || pool.Type == PoolType.PropEarlyHop)
             {
                 var dd = (int)(pool.RoundTime / 86400);
                 var hh = (int)((pool.RoundTime - (dd * 86400)) / 3600);
@@ -276,6 +294,7 @@ namespace SimHopper
                 switch (roundResult.Type)
                 {
                     case PoolType.Prop:
+                    case PoolType.PropEarlyHop:
                         propEarn += roundResult.Profit;
                         propTotalShare += roundResult.ValidShare + roundResult.LostShare;
                         break;

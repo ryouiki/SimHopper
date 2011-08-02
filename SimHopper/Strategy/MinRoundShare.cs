@@ -33,6 +33,24 @@ namespace SimHopper
                 }
             }
 
+            if (best =="")
+            {
+                foreach (var pool in pools)
+                {
+                    var progress = minProgress;
+                    if (pool.Value.Type == PoolType.PropEarlyHop)
+                    {
+                        progress = (float)pool.Value.CurrentShare / _difficulty;
+                        progress *= 4.0f;
+                    }
+
+                    if (progress < 0.43f && progress < minProgress)
+                    {
+                        best = pool.Key;
+                    }
+                }
+            }
+
             if (best == "")
             {
                 foreach (var pool in pools)

@@ -6,6 +6,7 @@ namespace SimHopper
     public enum PoolType
     {
         Prop,
+        PropEarlyHop,
         Pplns,
         Smpps,
         Score
@@ -35,6 +36,7 @@ namespace SimHopper
             switch (type)
             {
                 case PoolType.Prop:
+                case PoolType.PropEarlyHop:
                     Profit = (float)ValidShare * 50.0f / (float)FinalShare;
                     break;
                 case PoolType.Pplns:
@@ -137,6 +139,7 @@ namespace SimHopper
                     }
                     break;
                 case PoolType.Prop:
+                case PoolType.PropEarlyHop:
                 case PoolType.Smpps:
                     MyValidShare += myValid;
                     MyLostShare += myLost;

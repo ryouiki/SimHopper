@@ -32,6 +32,24 @@ namespace SimHopper
                 }
             }
 
+            if (best == null)
+            {
+                foreach (var pool in pools)
+                {
+                    if (pool.Value.Type == PoolType.PropEarlyHop)
+                    {
+                        var progress = (float)pool.Value.CurrentShare / _difficulty;
+                        var roundTime = pool.Value.RoundTime;
+
+                        progress *= 4.0f;
+
+                        if (progress < 0.43f && roundTime < minRoundTime)
+                        {
+                            best = pool.Key;
+                        }
+                    }
+                }
+            }
 
             if (best == null)
             {
@@ -42,10 +60,7 @@ namespace SimHopper
                         var progress = (float)pool.Value.CurrentShare / _difficulty;
                         var roundTime = pool.Value.RoundTime;
 
-                        if (pool.Value.Type == PoolType.Pplns)
-                        {
-                            progress *= 4.0f;
-                        }
+                        progress *= 4.0f;
 
                         if (progress < 0.43f && roundTime < minRoundTime)
                         {
@@ -64,11 +79,8 @@ namespace SimHopper
                         var progress = (float)pool.Value.CurrentShare / _difficulty;
                         var roundTime = pool.Value.RoundTime;
 
-                        if (pool.Value.Type == PoolType.Score)
-                        {
-                            progress *= 4.0f;
-                        }
-
+                        progress *= 4.0f;
+                        
                         if (progress < 0.43f && roundTime < minRoundTime)
                         {
                             best = pool.Key;

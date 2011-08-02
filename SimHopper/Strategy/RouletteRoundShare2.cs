@@ -45,12 +45,12 @@ namespace SimHopper
             if (sharePropPools.Count == 0)
             {
                 sharePropPools = pools
-                    .Where(pool => pool.Value.Type == PoolType.Score && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
+                    .Where(pool => pool.Value.Type == PoolType.PropEarlyHop && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
                     .ToDictionary(pool => pool.Key, pool =>
-                                                        {
-                                                            var d = (double)_difficulty / (pool.Value.CurrentShare);
-                                                            return (float)(d * d);
-                                                        });
+                    {
+                        var d = (double)_difficulty / (pool.Value.CurrentShare);
+                        return (float)(d * d);
+                    });
             }
 
             if (sharePropPools.Count == 0)
@@ -62,6 +62,17 @@ namespace SimHopper
                                                             var d = (double)_difficulty / (pool.Value.CurrentShare);
                                                             return (float)(d * d);
                                                         });
+            }
+
+            if (sharePropPools.Count == 0)
+            {
+                sharePropPools = pools
+                    .Where(pool => pool.Value.Type == PoolType.Score && pool.Value.CurrentShare * 4.0 < _difficulty * 0.43)
+                    .ToDictionary(pool => pool.Key, pool =>
+                    {
+                        var d = (double)_difficulty / (pool.Value.CurrentShare);
+                        return (float)(d * d);
+                    });
             }
 
             if (sharePropPools.Count > 0)

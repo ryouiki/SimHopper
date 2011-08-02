@@ -10,8 +10,10 @@ namespace SimHopper
         private readonly int _difficulty;
 
         public double SliceSize { get; set; }
+        public float EarliHopFactor { get; set; }
         public float PPLNSFactor { get; set; }
         public float ScoreFactor { get; set; }
+        public float Threshold { get; set; }
 
         private MersenneTwister _rnd;
         
@@ -21,8 +23,11 @@ namespace SimHopper
         public Flower(int difficulty)
         {
             SliceSize = 1200;           // default
+            EarliHopFactor = 4.0f;          // default
             PPLNSFactor = 4.0f;          // default
             ScoreFactor = 4.0f;          // default
+            Threshold = 0.43f;           // default
+
             _difficulty = difficulty;
             _rnd = new MersenneTwister((uint)DateTime.Now.Ticks);
             _slicedShare = new Dictionary<string, float>();
@@ -40,6 +45,9 @@ namespace SimHopper
                 var modShare = pool.Value.CurrentShare + 1;
                 switch (pool.Value.Type)
                 {
+                    case PoolType.PropEarlyHop:
+                        modShare *= EarliHopFactor;
+                        break;
                     case PoolType.Pplns:
                         modShare *= PPLNSFactor;
                         break;
@@ -48,7 +56,7 @@ namespace SimHopper
                         break;
                 }
 
-                if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty*0.43)
+                if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty * Threshold)
                 {
                     continue;
                 }
@@ -67,6 +75,9 @@ namespace SimHopper
                     var modShare = pool.Value.CurrentShare + 1;
                     switch (pool.Value.Type)
                     {
+                        case PoolType.PropEarlyHop:
+                            modShare *= EarliHopFactor;
+                            break;
                         case PoolType.Pplns:
                             modShare *= PPLNSFactor;
                             break;
@@ -75,7 +86,7 @@ namespace SimHopper
                             break;
                     }
 
-                    if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty * 0.43)
+                    if (pool.Value.Type == PoolType.Smpps || modShare > _difficulty * Threshold)
                     {
                         continue;
                     }
@@ -108,6 +119,9 @@ namespace SimHopper
                     var modShare = pools[s.Key].CurrentShare + 1;
                     switch(pools[s.Key].Type)
                     {
+                        case PoolType.PropEarlyHop:
+                            modShare *= EarliHopFactor;
+                            break;
                         case PoolType.Pplns:
                             modShare *= PPLNSFactor;
                             break;
@@ -130,6 +144,18 @@ namespace SimHopper
                 {
                     best = i.Key;
                     break;
+                }
+            }
+
+            if (best == null)
+            {
+                foreach (var i in _slice)
+                {
+                    if (i.Value > 0 && pools[i.Key].Type == PoolType.PropEarlyHop)
+                    {
+                        best = i.Key;
+                        break;
+                    }
                 }
             }
 
