@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SimHopper
 {
@@ -19,17 +20,13 @@ namespace SimHopper
 
             // count progress
 
-            float minProgress = 1000.0f;
+            float minProgress = Threshold;
 
-            foreach (var pool in pools)
+            foreach (var pool in pools.Where(p=>p.Value.Type==PoolType.Prop))
             {
-                var progress = minProgress;
-                if (pool.Value.Type == PoolType.Prop)
-                {
-                    progress = (float)pool.Value.CurrentShare / _difficulty;
-                }
+                var progress = (float)pool.Value.CurrentShare / _difficulty;
 
-                if (progress < Threshold && progress < minProgress)
+                if (progress < minProgress)
                 {
                     minProgress = progress;
                     best = pool.Key;
@@ -38,16 +35,12 @@ namespace SimHopper
 
             if (best =="")
             {
-                foreach (var pool in pools)
+                foreach (var pool in pools.Where(p => p.Value.Type == PoolType.PropEarlyHop))
                 {
-                    var progress = minProgress;
-                    if (pool.Value.Type == PoolType.PropEarlyHop)
-                    {
-                        progress = (float)pool.Value.CurrentShare / _difficulty;
-                        progress *= 4.0f;
-                    }
+                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    progress *= 4.0f;
 
-                    if (progress < Threshold && progress < minProgress)
+                    if (progress < minProgress)
                     {
                         minProgress = progress;
                         best = pool.Key;
@@ -57,16 +50,13 @@ namespace SimHopper
 
             if (best == "")
             {
-                foreach (var pool in pools)
+                foreach (var pool in pools.Where(p => p.Value.Type == PoolType.Pplns))
                 {
-                    var progress = minProgress;
-                    if (pool.Value.Type == PoolType.Pplns)
-                    {
-                        progress = (float)pool.Value.CurrentShare / _difficulty;
-                        progress *= 4.0f;
-                    }
+                    
+                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    progress *= 4.0f;
 
-                    if (progress < Threshold && progress < minProgress)
+                    if (progress < minProgress)
                     {
                         minProgress = progress;
                         best = pool.Key;
@@ -76,16 +66,13 @@ namespace SimHopper
 
             if (best == "")
             {
-                foreach (var pool in pools)
+                foreach (var pool in pools.Where(p => p.Value.Type == PoolType.Score))
                 {
-                    var progress = minProgress;
-                    if (pool.Value.Type == PoolType.Score)
-                    {
-                        progress = (float)pool.Value.CurrentShare / _difficulty;
-                        progress *= 4.0f;
-                    }
-
-                    if (progress < Threshold && progress < minProgress)
+                    
+                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    progress *= 4.0f;
+                    
+                    if (progress < minProgress)
                     {
                         minProgress = progress;
                         best = pool.Key;
