@@ -96,15 +96,23 @@ namespace SimHopper
             TotalScore = 0;
             MyScore = 0;
 
+            Initialize(initialProgress);
+        }
+
+        public void Initialize(float initialProgress)
+        {
             TargetRoundShare = GetNextShare();
 
-            if ( initialProgress < 0)
+            if (initialProgress < 0)
             {
                 initialProgress = (float)_rnd.NextDouble();
             }
 
-            CurrentRealShare = (int)(initialProgress*TargetRoundShare);
-            CurrentShare = CurrentRealShare;
+            CurrentRealShare = (int)(initialProgress * TargetRoundShare);
+            RealRoundTime = (int)(4.0*CurrentRealShare/GHashSpeed);
+
+            RoundTime = RealRoundTime < DelaySec ? 0 : (RealRoundTime - DelaySec);
+            CurrentShare = (int) (RoundTime*GHashSpeed*0.25f);
         }
 
         public RoundResult Advance(int seconds, float myShare)
