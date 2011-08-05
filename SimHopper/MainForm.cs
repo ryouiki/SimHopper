@@ -43,8 +43,8 @@ namespace SimHopper
             var seed = (uint)DateTime.Now.Ticks;
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
-            
-            _simConfig = new BasicSimConfig("RS_thr", GetNextTarget);
+
+            _simConfig = new PoolAddingSimConfig(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 

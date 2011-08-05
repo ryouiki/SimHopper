@@ -4,7 +4,6 @@ namespace SimHopper
 {
     public class BasicSimConfig : ISimConfig
     {
-        public string Name { get; private set; }
         public int Difficulty { get; private set; }
         public int MaxSimulationDay { get; private set; }
         public int MaxSimulationRound { get; private set; }
@@ -16,12 +15,10 @@ namespace SimHopper
 
         public BasicSimConfig(string name, GetTargetShareHandler targetHandler)
         {
-            Name = name;
-
             Difficulty = 1888786;
-            MaxSimulationDay = 256;
-            MaxSimulationRound = 100;
-            MaxSimulationGeneration = 70;
+            MaxSimulationDay = 520;
+            MaxSimulationRound = 150;
+            MaxSimulationGeneration = 73;
             InitialSimulationSpeedUp = 120000;
 
             Servers = new Dictionary<string, PoolServer>();
@@ -45,14 +42,13 @@ namespace SimHopper
 
             //_servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, -1, 60, 8.13f, GetNextTarget));
             //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
-            //_servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, -1, 0, 0.0f, GetNextTarget));
             Servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, 0, 0.0f, targetHandler));
         }
 
         public string SetupGeneration(int generation)
         {
             var threshold = 0.235f + 0.005f * generation;
-            var title = string.Format("{0}{1:0.000}", Name,threshold);
+            var title = string.Format("{0}{1:0.000}", "minRS", threshold);
 
             Strategy = new MinRoundShare(Difficulty) {Threshold = threshold};
 

@@ -21,8 +21,6 @@ namespace SimHopper
 
     public interface ISimConfig
     {
-        string Name { get; }
-
         int Difficulty { get; }
         int MaxSimulationDay { get; }
         int MaxSimulationRound { get; }
