@@ -46,7 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISimConfig.cs" />
+    <Compile Include="Config\BasicSimConfig.cs" />
+    <Compile Include="Config\ISimConfig.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

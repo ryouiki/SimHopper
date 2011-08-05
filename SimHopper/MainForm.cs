@@ -44,7 +44,7 @@ namespace SimHopper
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
             
-            _simConfig = new DefaultSimConfig("RS_thr", GetNextTarget);
+            _simConfig = new BasicSimConfig("RS_thr", GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -60,111 +60,6 @@ namespace SimHopper
 
             _currentGenerationTitle = _simConfig.SetupGeneration(_currentSimGeneration);
             labelGeneration.Text = _currentGenerationTitle;
-
-            //{
-            //    // test threshold for MinRoundShare
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 40;
-            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("RS_thr{0:0.00}", threshold);
-            //    _strategies.Add(_currentGenerationTitle, new MinRoundShare(Difficulty) { Threshold = threshold });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // time-slicing / selection type
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 1;
-            //    int selectType = _currentSimGeneration+3;
-            //    _currentGenerationTitle = string.Format("Flower_selType{0}", selectType);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SelectType = selectType });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test threshold for time-slicing
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 20;
-            //    var powval = 1.4f + 0.1f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("Flower_pow{0:0.00}", powval);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { PowerValue = powval });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test threshold for time-slicing
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 20;
-            //    var threshold = 0.35f + 0.01f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("Flower_thr{0:0.00}", threshold);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { Threshold = threshold });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test threshold for time-slicing
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 64;
-            //    var slice = 100 + 100*(int)(_currentSimGeneration/2);
-            //    var type = (_currentSimGeneration-1)%2;
-            //    _currentGenerationTitle = string.Format("Flower_slice{0}_t{1}", slice, type);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SliceSize = slice, SelectType = type });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test thresholds for ryouiki's
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 40;
-            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
-            //    _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test thresholds for roundtime
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 40;
-            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("RT_thr{0:0.00}", threshold);
-            //    _strategies.Add(_currentGenerationTitle, new MinRoundTime(Difficulty) { Threshold = threshold });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
-
-            //{
-            //    // test earlyhop factor for time-slicing
-            //    MaxSimulationDay = 1000;
-            //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 20;
-            //    var factor = 1.6f + 0.2f * _currentSimGeneration;
-            //    _currentGenerationTitle = string.Format("Flower_earlyFactor{0:0.00}", factor);
-            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { EarliHopFactor = factor });
-            //    labelGeneration.Text = _currentGenerationTitle;
-
-            //    _currentStrategy = _currentGenerationTitle;
-            //}
 
             _stat = new Stat(_simConfig.MaxSimulationDay);
             SetupRound();
@@ -199,32 +94,6 @@ namespace SimHopper
             _advPerTick = Convert.ToInt32(labelAdvPerTick.Text);
             _toLog = true;
 
-            //_servers.Add("mtred", new PoolServer("mtred", PoolType.Prop, 350, -1, 300, 8.18f, GetNextTarget));
-            //_servers.Add("polmine", new PoolServer("polmine", PoolType.Prop, 130, -1, 300, 6.7f, GetNextTarget));
-            //_servers.Add("bitclockers", new PoolServer("bitclockers", PoolType.Prop, 233, -1, 60, 5.0f, GetNextTarget));
-            //_servers.Add("rfcpool", new PoolServer("rfcpool", PoolType.Prop, 90, -1, 60, 2.1f, GetNextTarget));
-            //_servers.Add("triplemining", new PoolServer("triplemining", PoolType.Prop, 72, -1, 60, 7.6f, GetNextTarget));
-            //_servers.Add("ozco", new PoolServer("ozco", PoolType.Prop, 122, -1, 60, 8.52f, GetNextTarget));
-            //_servers.Add("nofeemining", new PoolServer("nofeemining", PoolType.Prop, 30, -1, 60, 3.5f, GetNextTarget));
-            //_servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
-            //_servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
-
-            //_servers.Add("btcg", new PoolServer("btcg", PoolType.PropEarlyHop, 2500, -1, 3600, 8.1f, GetNextTarget));
-
-            //_servers.Add("btcserv", new PoolServer("btcserv", PoolType.Prop, 5, -1, 60, 5.0f, GetNextTarget));
-
-            //_servers.Add("mini-1", new PoolServer("mini-1", PoolType.Prop, 8, -1, 60, 5.0f, GetNextTarget));
-            //_servers.Add("mini-2", new PoolServer("mini-2", PoolType.Prop, 8, -1, 60, 5.0f, GetNextTarget));
-
-            //_servers.Add("tiny-1", new PoolServer("tiny-1", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
-            //_servers.Add("tiny-2", new PoolServer("tiny-2", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
-            //_servers.Add("tiny-3", new PoolServer("tiny-3", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
-            //_servers.Add("tiny-4", new PoolServer("tiny-4", PoolType.Prop, 2, -1, 60, 5.0f, GetNextTarget));
-
-            //_servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, -1, 60, 8.13f, GetNextTarget));
-            //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
-            //_servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, -1, 0, 0.0f, GetNextTarget));
-            
             _currentServer = SelectBestPool(0);
         }
 
