@@ -7,7 +7,7 @@ namespace SimHopper
 {
     public class RouletteRoundShare : IHopStrategy
     {
-        public float Threshold { get; set; }
+        public double Threshold { get; set; }
         private readonly int _difficulty;
         private const int MaxRouletteDelay = 20;
         private int _currentRouletteDelay = 0;

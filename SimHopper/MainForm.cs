@@ -21,17 +21,10 @@ namespace SimHopper
         private Stat _stat;
         private int _totalHop;
 
-        private int Difficulty = 1888786;
-        private int MaxSimulationDay = 100;
-        private int MaxSimulationRound = 400;
-        private int MaxSimulationGeneration = 1;
-        private int InitialSimulationSpeedUp = 8192;
+        private ISimConfig _simConfig;
 
-        private Dictionary<string, PoolServer> _servers = new Dictionary<string, PoolServer>();
         private List<RoundResult> _results = new List<RoundResult>();
-        private Dictionary<string, IHopStrategy> _strategies;
 
-        private string _currentStrategy;
         private string _currentServer = "";
         private int _advPerTick = 1;
         private int _currentSimRound = 0;
@@ -50,7 +43,11 @@ namespace SimHopper
             var seed = (uint)DateTime.Now.Ticks;
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
-            labelAdvPerTick.Text = InitialSimulationSpeedUp.ToString();
+            
+            _simConfig = new DefaultSimConfig("RS_thr", GetNextTarget);
+
+            labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
+
             SetupGeneration();
         }
 
@@ -58,33 +55,24 @@ namespace SimHopper
         {
             ++_currentSimGeneration;
             _currentSimRound = 0;
-            _strategies = new Dictionary<string, IHopStrategy>
-                              {
-                                  {"MinRoundShare", new MinRoundShare(Difficulty)},
-                                  {"MinRoundTime", new MinRoundTime(Difficulty)},
-                                  {"RouletteRoundShare", new RouletteRoundShare(Difficulty)},
-                                  {"RouletteRoundShare2", new RouletteRoundShare2(Difficulty)},
-                                  {"MinRTMTDP", new MinRTMTDP(Difficulty)},
-                                  {"Flower_2400", new Flower(Difficulty) {SliceSize = 2400.0}},
-                                  {"Flower_1200", new Flower(Difficulty) {SliceSize = 1200.0}},
-                                  {"Flower_600", new Flower(Difficulty) {SliceSize = 600.0}},
-                                  {"Flower_300", new Flower(Difficulty) {SliceSize = 300.0}}
-                              };
 
             // simuation setup for the generation
 
-            {
-                // test threshold for MinRoundShare
-                MaxSimulationDay = 1000;
-                MaxSimulationRound = 100;
-                MaxSimulationGeneration = 20;
-                var threshold = 0.35f + 0.01f * _currentSimGeneration;
-                _currentGenerationTitle = string.Format("RS_thr{0:0.00}", threshold);
-                _strategies.Add(_currentGenerationTitle, new MinRoundShare(Difficulty) { Threshold = threshold });
-                labelGeneration.Text = _currentGenerationTitle;
+            _currentGenerationTitle = _simConfig.SetupGeneration(_currentSimGeneration);
+            labelGeneration.Text = _currentGenerationTitle;
 
-                _currentStrategy = _currentGenerationTitle;
-            }
+            //{
+            //    // test threshold for MinRoundShare
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 40;
+            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
+            //    _currentGenerationTitle = string.Format("RS_thr{0:0.00}", threshold);
+            //    _strategies.Add(_currentGenerationTitle, new MinRoundShare(Difficulty) { Threshold = threshold });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
 
             //{
             //    // time-slicing / selection type
@@ -126,11 +114,25 @@ namespace SimHopper
             //}
 
             //{
+            //    // test threshold for time-slicing
+            //    MaxSimulationDay = 1000;
+            //    MaxSimulationRound = 100;
+            //    MaxSimulationGeneration = 64;
+            //    var slice = 100 + 100*(int)(_currentSimGeneration/2);
+            //    var type = (_currentSimGeneration-1)%2;
+            //    _currentGenerationTitle = string.Format("Flower_slice{0}_t{1}", slice, type);
+            //    _strategies.Add(_currentGenerationTitle, new Flower(Difficulty) { SliceSize = slice, SelectType = type });
+            //    labelGeneration.Text = _currentGenerationTitle;
+
+            //    _currentStrategy = _currentGenerationTitle;
+            //}
+
+            //{
             //    // test thresholds for ryouiki's
             //    MaxSimulationDay = 1000;
             //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 20;
-            //    var threshold = 0.30f + 0.02f * _currentSimGeneration;
+            //    MaxSimulationGeneration = 40;
+            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
             //    _currentGenerationTitle = string.Format("ryouiki_thr{0:0.00}", threshold);
             //    _strategies.Add(_currentGenerationTitle, new MinRTMTDP(Difficulty) { Threshold = threshold });
             //    labelGeneration.Text = _currentGenerationTitle;
@@ -142,8 +144,8 @@ namespace SimHopper
             //    // test thresholds for roundtime
             //    MaxSimulationDay = 1000;
             //    MaxSimulationRound = 100;
-            //    MaxSimulationGeneration = 20;
-            //    var threshold = 0.30f + 0.02f * _currentSimGeneration;
+            //    MaxSimulationGeneration = 40;
+            //    var threshold = 0.25f + 0.01f * _currentSimGeneration;
             //    _currentGenerationTitle = string.Format("RT_thr{0:0.00}", threshold);
             //    _strategies.Add(_currentGenerationTitle, new MinRoundTime(Difficulty) { Threshold = threshold });
             //    labelGeneration.Text = _currentGenerationTitle;
@@ -164,13 +166,13 @@ namespace SimHopper
             //    _currentStrategy = _currentGenerationTitle;
             //}
 
-            _stat = new Stat(MaxSimulationDay);
+            _stat = new Stat(_simConfig.MaxSimulationDay);
             SetupRound();
         }
 
         public void FinishSimGeneration()
         {
-            if (_currentSimGeneration< MaxSimulationGeneration)
+            if (_currentSimGeneration < _simConfig.MaxSimulationGeneration)
             {
                 SetupGeneration();
             }
@@ -182,30 +184,30 @@ namespace SimHopper
 
         public void SetupRound()
         {
-            _roundShares = new List<int>();
-            _servers.Clear();
+            LoadRoundshares();
+
+            _simConfig.InitializeServers();
+
             _results.Clear();
             _elapsedTime = 0;
             _totalHop = 0;
             _currentServer = "";
             ++_currentSimRound;
 
-            LoadRoundshares();
-
             labelSimulRound.Text = "Simulation Round #" + _currentSimRound;
 
             _advPerTick = Convert.ToInt32(labelAdvPerTick.Text);
             _toLog = true;
 
-            _servers.Add("mtred", new PoolServer("mtred", PoolType.Prop, 350, -1, 300, 8.18f, GetNextTarget));
-            _servers.Add("polmine", new PoolServer("polmine", PoolType.Prop, 130, -1, 300, 6.7f, GetNextTarget));
-            _servers.Add("bitclockers", new PoolServer("bitclockers", PoolType.Prop, 233, -1, 60, 5.0f, GetNextTarget));
-            _servers.Add("rfcpool", new PoolServer("rfcpool", PoolType.Prop, 90, -1, 60, 2.1f, GetNextTarget));
-            _servers.Add("triplemining", new PoolServer("triplemining", PoolType.Prop, 72, -1, 60, 7.6f, GetNextTarget));
-            _servers.Add("ozco", new PoolServer("ozco", PoolType.Prop, 122, -1, 60, 8.52f, GetNextTarget));
-            _servers.Add("nofeemining", new PoolServer("nofeemining", PoolType.Prop, 30, -1, 60, 3.5f, GetNextTarget));
-            _servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
-            _servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
+            //_servers.Add("mtred", new PoolServer("mtred", PoolType.Prop, 350, -1, 300, 8.18f, GetNextTarget));
+            //_servers.Add("polmine", new PoolServer("polmine", PoolType.Prop, 130, -1, 300, 6.7f, GetNextTarget));
+            //_servers.Add("bitclockers", new PoolServer("bitclockers", PoolType.Prop, 233, -1, 60, 5.0f, GetNextTarget));
+            //_servers.Add("rfcpool", new PoolServer("rfcpool", PoolType.Prop, 90, -1, 60, 2.1f, GetNextTarget));
+            //_servers.Add("triplemining", new PoolServer("triplemining", PoolType.Prop, 72, -1, 60, 7.6f, GetNextTarget));
+            //_servers.Add("ozco", new PoolServer("ozco", PoolType.Prop, 122, -1, 60, 8.52f, GetNextTarget));
+            //_servers.Add("nofeemining", new PoolServer("nofeemining", PoolType.Prop, 30, -1, 60, 3.5f, GetNextTarget));
+            //_servers.Add("poolmunity", new PoolServer("poolmunity", PoolType.Prop, 10, -1, 60, 2.26f, GetNextTarget));
+            //_servers.Add("bclc", new PoolServer("bclc", PoolType.Prop, 500, -1, 1800, 8.1f, GetNextTarget));
 
             //_servers.Add("btcg", new PoolServer("btcg", PoolType.PropEarlyHop, 2500, -1, 3600, 8.1f, GetNextTarget));
 
@@ -221,13 +223,14 @@ namespace SimHopper
 
             //_servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, -1, 60, 8.13f, GetNextTarget));
             //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
-            _servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, -1, 0, 0.0f, GetNextTarget));
-
+            //_servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, -1, 0, 0.0f, GetNextTarget));
+            
             _currentServer = SelectBestPool(0);
         }
 
         private void LoadRoundshares()
         {
+            _roundShares = new List<int>();
             string strSaveFilePath = "rand.txt";
             StreamReader reader = new StreamReader(strSaveFilePath, System.Text.Encoding.UTF8);
             string strFileLine = string.Empty;
@@ -248,7 +251,7 @@ namespace SimHopper
 
             if (_roundShares.Count == 0)
             {
-                _rnd.GenerateRoundShares(_roundShares, 50, (uint)Difficulty);
+                _rnd.GenerateRoundShares(_roundShares, 50, (uint)_simConfig.Difficulty);
             }
 
             return target;
@@ -256,7 +259,7 @@ namespace SimHopper
 
         private string SelectBestPool(int advancedSeconds)
         {
-            return _strategies[_currentStrategy].GetBestPool(_servers, _currentServer, advancedSeconds);
+            return _simConfig.Strategy.GetBestPool(_simConfig.Servers, _currentServer, advancedSeconds);
         }
 
         private void InternalAdvance()
@@ -275,7 +278,7 @@ namespace SimHopper
             _elapsedTime += MIN_PER_TICK * 60;
 
             // pool processing
-            foreach (var info in _servers)
+            foreach (var info in _simConfig.Servers)
             {
                 if (info.Key == _currentServer)
                 {
@@ -314,8 +317,8 @@ namespace SimHopper
             labelCurrentPool.Text = string.Format("Current : {0}", _currentServer);
 
             // print current info
-            double pps = 50.0f / Difficulty;
-            var pool = _servers[_currentServer];
+            double pps = 50.0f / _simConfig.Difficulty;
+            var pool = _simConfig.Servers[_currentServer];
             if (pool.Type == PoolType.Prop || pool.Type == PoolType.PropEarlyHop)
             {
                 var dd = (int)(pool.RoundTime / 86400);
@@ -375,34 +378,47 @@ namespace SimHopper
                 }
             }
 
-            labelPropEarn.Text = string.Format("Prop. earn : {0:0.00000000} BTC", propEarn);
+            double propEff=0;
+            double pplnsEff=0;
+            double scoreEff=0;
+            double hopPerDay = 0;
 
-            propTotalShare = propTotalShare == 0 ? 1 : propTotalShare;
-            var propEff = 100.0*propEarn/(pps*propTotalShare);
+            if (propTotalShare>0)
+            {
+                propEff = 100.0 * propEarn / (pps * propTotalShare);
+            }
+            labelPropEarn.Text = string.Format("Prop. earn : {0:0.00000000} BTC", propEarn);
             labelPropEff.Text = string.Format("Prop. Eff : {1} share - {0:0.00}%", propEff, propTotalShare);
 
+            if(pplnsTotalShare>0)
+            {
+                pplnsEff = 100.0*pplnsEarn/(pps*pplnsTotalShare);
+            }
             labelPplnsEarn.Text = string.Format("PPLNS earn : {0:0.00000000} BTC", pplnsEarn);
-            pplnsTotalShare = pplnsTotalShare == 0 ? 1 : pplnsTotalShare;
-            var pplnsEff = 100.0*pplnsEarn/(pps*pplnsTotalShare);
             labelPplnsEff.Text = string.Format("PPLNS Eff : {1} share - {0:0.00}%", pplnsEff, pplnsTotalShare);
 
+            if (scoreTotalShare>0)
+            {
+                scoreEff = 100.0 * scoreEarn / (pps * scoreTotalShare);
+            }
             labelScoreEarn.Text = string.Format("Score earn : {0:0.00000000} BTC", scoreEarn);
-            scoreTotalShare = scoreTotalShare == 0 ? 1 : scoreTotalShare;
-            var scoreEff = 100.0*scoreEarn/(pps*scoreTotalShare);
             labelScoreEff.Text = string.Format("Score Eff : {1} share - {0:0.00}%", scoreEff, scoreTotalShare);
 
-            var smppsEarn = pps * _servers["smpps"].MyValidShare;
+            var smppsEarn = pps * _simConfig.Servers["smpps"].MyValidShare;
 
             labelPPSEarn.Text = string.Format("SMPPS earn : {0:0.00000000} BTC", smppsEarn);
 
             labelTotalEarn.Text = string.Format("Total earn : {0:0.00000000} BTC", propEarn + pplnsEarn + smppsEarn);
 
-            totalShare = propTotalShare + pplnsTotalShare + scoreTotalShare + (int)_servers["smpps"].MyValidShare;
+            totalShare = propTotalShare + pplnsTotalShare + scoreTotalShare + (int)_simConfig.Servers["smpps"].MyValidShare;
 
             var totalEff = 100.0*(propEarn + pplnsEarn + scoreEarn + smppsEarn)/(pps*totalShare);
             labelTotalEff.Text = string.Format("Total Eff : {1} share - {0:0.00}%", totalEff, totalShare);
 
-            var hopPerDay = (float) _totalHop/days;
+            if (days > 0)
+            {
+                hopPerDay = (double)_totalHop/days;
+            }
             labelHop.Text = string.Format("{0:0.00} Hops per day", hopPerDay);
 
             var totalEarn = propEarn + pplnsEarn + scoreEarn + smppsEarn;
@@ -411,7 +427,7 @@ namespace SimHopper
                                        totalEff, totalEarn, _totalHop);
             _stat.AddStat(stat);
 
-            if (days > MaxSimulationDay)
+            if (days > _simConfig.MaxSimulationDay)
             {
                 if (_toLog)
                 {
@@ -425,7 +441,7 @@ namespace SimHopper
 
                 if (checkBoxAuto.Checked)
                 {
-                    if (_currentSimRound < MaxSimulationRound)
+                    if (_currentSimRound < _simConfig.MaxSimulationRound)
                     {
                         SetupRound();
                     }

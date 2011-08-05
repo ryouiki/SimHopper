@@ -79,16 +79,11 @@ namespace MTRand
             }
         }
 
-        public T Roulette<T>(Dictionary<T, float> roullette)
+        public T Roulette<T>(Dictionary<T, double> roullette)
         {
             var result = roullette.Last().Key;
 
-            float sum = 0.0f;
-
-            foreach (var pair in roullette)			// sum of all values
-            {
-                sum += pair.Value;
-            }
+            double sum = roullette.Sum(pair => pair.Value);
 
             var judge = this.NextDouble() * sum;	// judge point from [0,sum]
 

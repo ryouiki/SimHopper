@@ -4,7 +4,7 @@ namespace SimHopper
 {
     public class MinRoundTime : IHopStrategy
     {
-        public float Threshold { get; set; }
+        public double Threshold { get; set; }
         private readonly int _difficulty;
 
         public MinRoundTime(int difficulty)
@@ -24,7 +24,7 @@ namespace SimHopper
             {
                 if (pool.Value.Type == PoolType.Prop)
                 {
-                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    var progress = pool.Value.CurrentShare / _difficulty;
                     var roundTime = pool.Value.RoundTime;
 
                     if (progress < Threshold && roundTime < minRoundTime)
@@ -41,7 +41,7 @@ namespace SimHopper
                 {
                     if (pool.Value.Type == PoolType.PropEarlyHop)
                     {
-                        var progress = (float)pool.Value.CurrentShare / _difficulty;
+                        var progress = pool.Value.CurrentShare / _difficulty;
                         var roundTime = pool.Value.RoundTime;
 
                         progress *= 4.0f;
@@ -61,7 +61,7 @@ namespace SimHopper
                 {
                     if (pool.Value.Type == PoolType.Pplns)
                     {
-                        var progress = (float)pool.Value.CurrentShare / _difficulty;
+                        var progress = pool.Value.CurrentShare / _difficulty;
                         var roundTime = pool.Value.RoundTime;
 
                         progress *= 4.0f;
@@ -81,7 +81,7 @@ namespace SimHopper
                 {
                     if (pool.Value.Type == PoolType.Score)
                     {
-                        var progress = (float)pool.Value.CurrentShare / _difficulty;
+                        var progress = pool.Value.CurrentShare / _difficulty;
                         var roundTime = pool.Value.RoundTime;
 
                         progress *= 4.0f;

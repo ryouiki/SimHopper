@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using MTRand;
 
 namespace SimHopper
@@ -23,7 +24,7 @@ namespace SimHopper
         public PoolType Type { get; private set; }
         public int RoundTime { get; private set; }
 
-        public float Profit { get; private set; }
+        public double Profit { get; private set; }
 
         public RoundResult(string poolName, PoolType type, int finalShare, int validShare, int lostShare, int roundTime)
         {
@@ -37,14 +38,14 @@ namespace SimHopper
             {
                 case PoolType.Prop:
                 case PoolType.PropEarlyHop:
-                    Profit = (float)ValidShare * 50.0f / (float)FinalShare;
+                    Profit = validShare * 50.0f / FinalShare;
                     break;
                 case PoolType.Pplns:
                     var f = (int) (FinalShare/2);
-                    Profit = f > 0 ? (float) ValidShare*50.0f/f : 0;
+                    Profit = f > 0 ? ValidShare*50.0f/f : 0;
                     break;
                 case PoolType.Score:
-                    Profit = (float)ValidShare * 50.0f / (float)FinalShare;
+                    Profit = ValidShare * 50.0f / FinalShare;
                     break;
             }
         }
@@ -54,15 +55,17 @@ namespace SimHopper
     public class PoolServer
     {
         public string PoolName { get; private set; }
-        public float CurrentShare { get; private set; }
-        public float CurrentRealShare { get; private set; }
+        public double CurrentShare { get; private set; }
+        public double CurrentRealShare { get; private set; }
         public int DelaySec { get; private set; }
         public int Round { get; private set; }
         public int TargetRoundShare { get; set; }
-        public float MyValidShare { get; set; }
-        public float MyLostShare { get; set; }
-        public int GHashSpeed { get; private set; }
-        public float RejectPercentile { get; private set; }
+        public double MyValidShare { get; set; }
+        public double MyLostShare { get; set; }
+        private int _ghashSpeed;
+        public int GHashSpeed { get { return _ghashSpeed; } set { _ghashSpeed = value; SharePerSec = value*0.25; } }
+        public double SharePerSec { get; private set; }
+        public double RejectPercentile { get; private set; }
 
         public double TotalScore { get; private set; }
         public double MyScore { get; private set; }
@@ -73,11 +76,14 @@ namespace SimHopper
 
         public int _delayRemain = -1;
 
+        private int _forwardMyShare=0;
+        private int _forwardRoundShare=0;
+
         private MersenneTwister _rnd;
 
         private GetTargetShareHandler GetNextShare;
 
-        public PoolServer(string poolName, PoolType type, int speed, float initialProgress, int delaySec, float rejectPercent, GetTargetShareHandler handler)
+        public PoolServer(string poolName, PoolType type, int speed, int delaySec, double rejectPercent, GetTargetShareHandler handler)
         {
             _rnd = new MersenneTwister((uint)DateTime.Now.Ticks);
             Round = 1;
@@ -96,31 +102,65 @@ namespace SimHopper
             TotalScore = 0;
             MyScore = 0;
 
-            Initialize(initialProgress);
+//            Initialize(initialProgress);
         }
 
-        public void Initialize(float initialProgress)
+        public void Initialize(double initialProgress)
         {
+            Round = 1;
+            MyValidShare = 0;
+            MyLostShare = 0;           
+            TotalScore = 0;
+            MyScore = 0;
+            _forwardMyShare = 0;
+            _forwardRoundShare = 0;
+
             TargetRoundShare = GetNextShare();
 
             if (initialProgress < 0)
             {
-                initialProgress = (float)_rnd.NextDouble();
+                initialProgress = (double)_rnd.NextDouble();
             }
 
             CurrentRealShare = (int)(initialProgress * TargetRoundShare);
-            RealRoundTime = (int)(4.0*CurrentRealShare/GHashSpeed);
+            RealRoundTime = (int)(CurrentRealShare / SharePerSec);
 
             RoundTime = RealRoundTime < DelaySec ? 0 : (RealRoundTime - DelaySec);
-            CurrentShare = (int) (RoundTime*GHashSpeed*0.25f);
+            CurrentShare = (int)(RoundTime * SharePerSec);
         }
 
-        public RoundResult Advance(int seconds, float myShare)
+        public RoundResult Advance(int seconds, double myShare)
         {
             RoundResult result = null;
             RealRoundTime += seconds;
-            float shareIncrease = ((float) GHashSpeed)*seconds/4.0f;
-            CurrentRealShare += shareIncrease;
+            double shareIncrease = SharePerSec * seconds;
+            CurrentRealShare += shareIncrease + _forwardRoundShare;
+            myShare += _forwardMyShare;
+            _forwardRoundShare = 0;
+            _forwardMyShare = 0;
+
+            if (myShare < 0 || MyValidShare < 0)
+            {
+                throw new Exception();
+            }
+            //Debug.WriteLine(String.Format("out {0} - {1} - {2}", CurrentRealShare, TargetRoundShare, myShare));
+
+            if(Type!=PoolType.Smpps)
+            {
+                var cutoff = (CurrentRealShare - TargetRoundShare) / shareIncrease;
+                if (cutoff > 0)
+                {
+                    _forwardMyShare = (int)(cutoff * myShare);
+                    if (_forwardMyShare > myShare)
+                    {
+                        _forwardMyShare = (int)myShare;
+                    }
+                    _forwardRoundShare = (int)(cutoff * shareIncrease);
+
+                    myShare -= _forwardMyShare;
+                    CurrentRealShare = TargetRoundShare;
+                }
+            }
 
             var myLost = RejectPercentile * 0.01f * myShare;
             var myValid = myShare - myLost;
@@ -131,6 +171,11 @@ namespace SimHopper
                 CurrentShare = CurrentRealShare;
                 RoundTime = RealRoundTime;
                 _delayRemain = DelaySec;
+            }
+
+            if (myShare < 0 || MyValidShare< 0)
+            {
+                throw new Exception();
             }
 
             switch (Type)
@@ -160,10 +205,16 @@ namespace SimHopper
                     break;
             }
 
+            if (MyValidShare < 0)
+            {
+                throw new Exception();
+            }
+
             if (Type != PoolType.Smpps &&
-                (int)CurrentRealShare > TargetRoundShare)
+                (int)CurrentRealShare >= TargetRoundShare)
             {
                 // block Found !!!
+
                 if(Type==PoolType.Score)
                 {
                     var validShare = (int)( (MyScore/TotalScore)*TargetRoundShare );
@@ -177,10 +228,16 @@ namespace SimHopper
                 }
 
                 CurrentRealShare = 0;
+                RealRoundTime = 0;
+                if (DelaySec==0)
+                {
+                    CurrentShare = 0;
+                    RoundTime = 0;
+                }
+                
                 MyValidShare = 0;
                 MyLostShare = 0;
                 TargetRoundShare = GetNextShare();
-                RealRoundTime = 0;
                 TotalScore = 0;
                 MyScore = 0;
                 Round++;

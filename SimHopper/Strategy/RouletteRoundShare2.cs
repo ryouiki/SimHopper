@@ -7,7 +7,7 @@ namespace SimHopper
 {
     public class RouletteRoundShare2 : IHopStrategy
     {
-        public float Threshold { get; set; }
+        public double Threshold { get; set; }
         private readonly int _difficulty;
         private const int MaxRouletteDelay = 20;
         private int _currentRouletteDelay = 0;
@@ -41,7 +41,7 @@ namespace SimHopper
                 .ToDictionary(pool => pool.Key, pool =>
                                                     {
                                                         var d = (double)_difficulty / (pool.Value.CurrentShare);
-                                                        return (float)(d * d);
+                                                        return (d * d);
                                                     });
 
             if (sharePropPools.Count == 0)
@@ -51,7 +51,7 @@ namespace SimHopper
                     .ToDictionary(pool => pool.Key, pool =>
                     {
                         var d = (double)_difficulty / (pool.Value.CurrentShare);
-                        return (float)(d * d);
+                        return (d * d);
                     });
             }
 
@@ -62,7 +62,7 @@ namespace SimHopper
                     .ToDictionary(pool => pool.Key, pool =>
                                                         {
                                                             var d = (double)_difficulty / (pool.Value.CurrentShare);
-                                                            return (float)(d * d);
+                                                            return (d * d);
                                                         });
             }
 
@@ -73,7 +73,7 @@ namespace SimHopper
                     .ToDictionary(pool => pool.Key, pool =>
                     {
                         var d = (double)_difficulty / (pool.Value.CurrentShare);
-                        return (float)(d * d);
+                        return (d * d);
                     });
             }
 

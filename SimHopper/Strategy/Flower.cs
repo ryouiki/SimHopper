@@ -10,16 +10,16 @@ namespace SimHopper
         private readonly int _difficulty;
 
         public double SliceSize { get; set; }
-        public float EarliHopFactor { get; set; }
-        public float PPLNSFactor { get; set; }
-        public float ScoreFactor { get; set; }
-        public float Threshold { get; set; }
-        public float PowerValue { get; set; }
+        public double EarliHopFactor { get; set; }
+        public double PPLNSFactor { get; set; }
+        public double ScoreFactor { get; set; }
+        public double Threshold { get; set; }
+        public double PowerValue { get; set; }
         public int SelectType { get; set; }         // 0 : first one    1 : biggest one     2 : smallest one    3 : fastest pool
 
         private MersenneTwister _rnd;
-        
-        private Dictionary<string, float> _slicedShare;
+
+        private Dictionary<string, double> _slicedShare;
         private Dictionary<string, int> _slice;
 
         public Flower(int difficulty)
@@ -35,7 +35,7 @@ namespace SimHopper
 
             _difficulty = difficulty;
             _rnd = new MersenneTwister((uint)DateTime.Now.Ticks);
-            _slicedShare = new Dictionary<string, float>();
+            _slicedShare = new Dictionary<string, double>();
             _slice = new Dictionary<string, int>();
         }
         

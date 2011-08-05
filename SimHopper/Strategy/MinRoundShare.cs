@@ -5,7 +5,7 @@ namespace SimHopper
 {
     public class MinRoundShare : IHopStrategy
     {
-        public float Threshold { get; set; }
+        public double Threshold { get; set; }
         private readonly int _difficulty;
 
         public MinRoundShare(int difficulty)
@@ -20,11 +20,11 @@ namespace SimHopper
 
             // count progress
 
-            float minProgress = Threshold;
+            double minProgress = Threshold;
 
             foreach (var pool in pools.Where(p=>p.Value.Type==PoolType.Prop))
             {
-                var progress = (float)pool.Value.CurrentShare / _difficulty;
+                var progress = pool.Value.CurrentShare / _difficulty;
 
                 if (progress < minProgress)
                 {
@@ -37,7 +37,7 @@ namespace SimHopper
             {
                 foreach (var pool in pools.Where(p => p.Value.Type == PoolType.PropEarlyHop))
                 {
-                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    var progress = pool.Value.CurrentShare / _difficulty;
                     progress *= 4.0f;
 
                     if (progress < minProgress)
@@ -53,7 +53,7 @@ namespace SimHopper
                 foreach (var pool in pools.Where(p => p.Value.Type == PoolType.Pplns))
                 {
                     
-                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    var progress = pool.Value.CurrentShare / _difficulty;
                     progress *= 4.0f;
 
                     if (progress < minProgress)
@@ -69,7 +69,7 @@ namespace SimHopper
                 foreach (var pool in pools.Where(p => p.Value.Type == PoolType.Score))
                 {
                     
-                    var progress = (float)pool.Value.CurrentShare / _difficulty;
+                    var progress = pool.Value.CurrentShare / _difficulty;
                     progress *= 4.0f;
                     
                     if (progress < minProgress)
