@@ -44,7 +44,7 @@ namespace SimHopper
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
 
-            _simConfig = new SlushTestConfig2(GetNextTarget);
+            _simConfig = new BclcTestConfig(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -215,6 +215,21 @@ namespace SimHopper
             {
                 labelPoolInfo.Text = string.Format("SMPPS my share : {0} / {1}rejected", (int)pool.MyValidShare, (int)pool.MyLostShare);
             }
+
+            dataGridPools.Rows.Clear();
+            foreach (var server in _simConfig.Servers)
+            {
+                double eff = 0;
+                if (server.Value.MyTotalShare>0)
+                {
+                    eff = 100*(server.Value.MyTotalProfit/server.Value.MyTotalShare)/pps;
+                }
+                dataGridPools.Rows.Add(server.Key, server.Value.MyValidShare, server.Value.CurrentShare,
+                                       server.Value.RoundTime,
+                                       string.Format("{0:0.00}", eff),
+                                       server.Value.MyTotalProfit);
+            }
+
 
             // print earn / eff
             double propEarn = 0.0;
