@@ -44,7 +44,7 @@ namespace SimHopper
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
 
-            _simConfig = new PoolAddingSimConfig(GetNextTarget);
+            _simConfig = new SlushTestConfig2(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 

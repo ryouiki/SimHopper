@@ -51,9 +51,9 @@ namespace SimHopper
                 Servers.Add(_serversToAdd[i].PoolName, _serversToAdd[i]);
             }
 
-            var title = string.Format("Prop.Pools-{0}Flo", generation);
+            var title = string.Format("Prop.Pools-{0}RT", generation);
 
-            Strategy = new Flower(Difficulty);
+            Strategy = new MinRoundTime(Difficulty);
 
             return title;
         }

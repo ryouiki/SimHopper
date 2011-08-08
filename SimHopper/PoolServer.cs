@@ -67,6 +67,9 @@ namespace SimHopper
         public double SharePerSec { get; private set; }
         public double RejectPercentile { get; private set; }
 
+        public float BaseProgress { get; set; }
+        public float PenaltyFactor { get; set; }
+
         public double TotalScore { get; private set; }
         public double MyScore { get; private set; }
 
@@ -101,6 +104,9 @@ namespace SimHopper
             RealRoundTime = 0;
             TotalScore = 0;
             MyScore = 0;
+
+            BaseProgress = 0;
+            PenaltyFactor = 0;
 
 //            Initialize(initialProgress);
         }
