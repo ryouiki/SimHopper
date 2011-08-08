@@ -44,7 +44,12 @@ namespace SimHopper
             _rnd = new MersenneTwister(seed);
             _currentSimGeneration = 0;
 
-            _simConfig = new BclcTestConfig(GetNextTarget);
+            //
+            //
+            // Simulation Configuration Here //
+            //
+            //
+            _simConfig = new SlushTestConfig2(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -224,7 +229,10 @@ namespace SimHopper
                 {
                     eff = 100*(server.Value.MyTotalProfit/server.Value.MyTotalShare)/pps;
                 }
-                dataGridPools.Rows.Add(server.Key, server.Value.MyValidShare, server.Value.CurrentShare,
+                var progress = string.Format("{0}% {1}", (int) (server.Value.CurrentShare/_simConfig.Difficulty*100),
+                                             server.Value.CurrentShare);
+
+                dataGridPools.Rows.Add(server.Key, (int)server.Value.MyValidShare, progress,
                                        server.Value.RoundTime,
                                        string.Format("{0:0.00}", eff),
                                        server.Value.MyTotalProfit);
