@@ -73,6 +73,10 @@ namespace SimHopper
         public double TotalScore { get; private set; }
         public double MyScore { get; private set; }
 
+        public double MyTotalProfit { get; private set; }
+        public double MyTotalValidShare { get; private set; }
+        public double MyTotalShare { get; private set; }    // including lost
+
         public int RoundTime { get ; private set; }
         public int RealRoundTime { get; private set; }
         public PoolType Type { get; private set; }
@@ -105,8 +109,12 @@ namespace SimHopper
             TotalScore = 0;
             MyScore = 0;
 
+            MyTotalProfit = 0;
+            MyTotalValidShare = 0;
+            MyTotalShare = 0;
+
             BaseProgress = 0;
-            PenaltyFactor = 0;
+            PenaltyFactor = 1.0f;
 
 //            Initialize(initialProgress);
         }
@@ -120,6 +128,10 @@ namespace SimHopper
             MyScore = 0;
             _forwardMyShare = 0;
             _forwardRoundShare = 0;
+
+            MyTotalProfit = 0;
+            MyTotalValidShare = 0;
+            MyTotalShare = 0;
 
             TargetRoundShare = GetNextShare();
 
@@ -232,6 +244,10 @@ namespace SimHopper
                 {
                     result = new RoundResult(PoolName, Type, TargetRoundShare, (int)MyValidShare, (int)MyLostShare, RoundTime);
                 }
+
+                MyTotalProfit += result.Profit;
+                MyTotalValidShare += result.ValidShare;
+                MyTotalShare += result.ValidShare + result.LostShare;
 
                 CurrentRealShare = 0;
                 RealRoundTime = 0;
