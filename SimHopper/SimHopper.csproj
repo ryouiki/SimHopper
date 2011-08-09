@@ -49,6 +49,7 @@
     <Compile Include="Config\BasicSimConfig.cs" />
     <Compile Include="Config\ISimConfig.cs" />
     <Compile Include="Config\PoolAddingSimConfig.cs" />
+    <Compile Include="Config\SlushTest.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

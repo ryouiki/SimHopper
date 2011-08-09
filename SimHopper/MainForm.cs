@@ -49,7 +49,7 @@ namespace SimHopper
             // Simulation Configuration Here //
             //
             //
-            _simConfig = new SlushTestConfig(GetNextTarget);
+            _simConfig = new BclcTest(GetNextTarget);
             //_simConfig = new BasicSimConfig(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
