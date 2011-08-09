@@ -65,5 +65,10 @@ namespace SimHopper
                 poolServer.Value.Initialize(-1);
             }
         }
+
+        public void FinishGeneration(List<RoundResult> results)
+        {
+
+        }
     }
 }

@@ -55,8 +55,9 @@
             this.dataGridPools = new System.Windows.Forms.DataGridView();
             this.Pool = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.MyShare = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.RoundShare = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Duration = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RoundShareDelayed = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RoundShareReal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DurationReal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Eff = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Profit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridPools)).BeginInit();
@@ -232,7 +233,7 @@
             this.textBoxLog.Multiline = true;
             this.textBoxLog.Name = "textBoxLog";
             this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxLog.Size = new System.Drawing.Size(555, 110);
+            this.textBoxLog.Size = new System.Drawing.Size(598, 103);
             this.textBoxLog.TabIndex = 13;
             // 
             // checkBoxAuto
@@ -278,22 +279,38 @@
             // 
             this.dataGridPools.AllowUserToAddRows = false;
             this.dataGridPools.AllowUserToDeleteRows = false;
+            this.dataGridPools.AllowUserToResizeColumns = false;
+            this.dataGridPools.AllowUserToResizeRows = false;
             this.dataGridPools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridPools.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridPools.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridPools.CausesValidation = false;
+            this.dataGridPools.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleVertical;
+            this.dataGridPools.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dataGridPools.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridPools.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Pool,
             this.MyShare,
-            this.RoundShare,
-            this.Duration,
+            this.RoundShareDelayed,
+            this.RoundShareReal,
+            this.DurationReal,
             this.Eff,
             this.Profit});
+            this.dataGridPools.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dataGridPools.EnableHeadersVisualStyles = false;
             this.dataGridPools.Location = new System.Drawing.Point(12, 268);
+            this.dataGridPools.MultiSelect = false;
             this.dataGridPools.Name = "dataGridPools";
             this.dataGridPools.ReadOnly = true;
+            this.dataGridPools.RowHeadersVisible = false;
             this.dataGridPools.RowHeadersWidth = 20;
+            this.dataGridPools.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridPools.RowTemplate.Height = 23;
-            this.dataGridPools.Size = new System.Drawing.Size(555, 268);
+            this.dataGridPools.ShowCellErrors = false;
+            this.dataGridPools.ShowCellToolTips = false;
+            this.dataGridPools.ShowEditingIcon = false;
+            this.dataGridPools.ShowRowErrors = false;
+            this.dataGridPools.Size = new System.Drawing.Size(598, 268);
             this.dataGridPools.TabIndex = 18;
             // 
             // Pool
@@ -301,46 +318,55 @@
             this.Pool.HeaderText = "Pool";
             this.Pool.Name = "Pool";
             this.Pool.ReadOnly = true;
-            this.Pool.Width = 80;
+            this.Pool.Width = 85;
             // 
             // MyShare
             // 
             this.MyShare.HeaderText = "MyShare";
             this.MyShare.Name = "MyShare";
             this.MyShare.ReadOnly = true;
-            this.MyShare.Width = 60;
+            this.MyShare.Width = 86;
             // 
-            // RoundShare
+            // RoundShareDelayed
             // 
-            this.RoundShare.HeaderText = "RoundShare";
-            this.RoundShare.Name = "RoundShare";
-            this.RoundShare.ReadOnly = true;
+            this.RoundShareDelayed.HeaderText = "RS (delay)";
+            this.RoundShareDelayed.Name = "RoundShareDelayed";
+            this.RoundShareDelayed.ReadOnly = true;
+            this.RoundShareDelayed.Width = 85;
             // 
-            // Duration
+            // RoundShareReal
             // 
-            this.Duration.HeaderText = "Duration";
-            this.Duration.Name = "Duration";
-            this.Duration.ReadOnly = true;
+            this.RoundShareReal.HeaderText = "RS (real)";
+            this.RoundShareReal.Name = "RoundShareReal";
+            this.RoundShareReal.ReadOnly = true;
+            this.RoundShareReal.Width = 85;
+            // 
+            // DurationReal
+            // 
+            this.DurationReal.HeaderText = "Duration(R)";
+            this.DurationReal.Name = "DurationReal";
+            this.DurationReal.ReadOnly = true;
+            this.DurationReal.Width = 85;
             // 
             // Eff
             // 
             this.Eff.HeaderText = "Eff";
             this.Eff.Name = "Eff";
             this.Eff.ReadOnly = true;
-            this.Eff.Width = 60;
+            this.Eff.Width = 86;
             // 
             // Profit
             // 
             this.Profit.HeaderText = "Profit";
             this.Profit.Name = "Profit";
             this.Profit.ReadOnly = true;
-            this.Profit.Width = 120;
+            this.Profit.Width = 85;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(579, 664);
+            this.ClientSize = new System.Drawing.Size(622, 657);
             this.Controls.Add(this.dataGridPools);
             this.Controls.Add(this.labelGeneration);
             this.Controls.Add(this.labelHop);
@@ -400,8 +426,9 @@
         private System.Windows.Forms.DataGridView dataGridPools;
         private System.Windows.Forms.DataGridViewTextBoxColumn Pool;
         private System.Windows.Forms.DataGridViewTextBoxColumn MyShare;
-        private System.Windows.Forms.DataGridViewTextBoxColumn RoundShare;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Duration;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RoundShareDelayed;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RoundShareReal;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DurationReal;
         private System.Windows.Forms.DataGridViewTextBoxColumn Eff;
         private System.Windows.Forms.DataGridViewTextBoxColumn Profit;
     }

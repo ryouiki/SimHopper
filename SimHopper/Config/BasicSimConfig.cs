@@ -13,11 +13,14 @@ namespace SimHopper
         public Dictionary<string, PoolServer> Servers { get; private set; }
         public IHopStrategy Strategy { get; private set; }
 
+        private StatSummary _statSummary;
+        private int _curGeneration;
+
         public BasicSimConfig(GetTargetShareHandler targetHandler)
         {
             Difficulty = 1888786;
             MaxSimulationDay = 520;
-            MaxSimulationRound = 150;
+            MaxSimulationRound = 20;
             MaxSimulationGeneration = 73;
             InitialSimulationSpeedUp = 120000;
 
@@ -43,14 +46,25 @@ namespace SimHopper
             //_servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, -1, 60, 8.13f, GetNextTarget));
             //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
             Servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, 0, 0.0f, targetHandler));
+
+            var columns = new List<string> {"Total Eff"};
+            var rows = new List<string>();
+            for(int g=1;g<=MaxSimulationGeneration;++g)
+            {
+                var threshold = 0.235f + 0.005f*g;
+                rows.Add(threshold.ToString());
+            }
+            _statSummary = new StatSummary("minRS3", columns, rows);
+
         }
 
         public string SetupGeneration(int generation)
         {
+            _curGeneration = generation;
             var threshold = 0.235f + 0.005f * generation;
-            var title = string.Format("{0}{1:0.000}", "minRS", threshold);
+            var title = string.Format("{0}{1:0.000}", _statSummary.StatName, threshold);
 
-            Strategy = new MinRoundShare(Difficulty) {Threshold = threshold};
+            Strategy = new MinRoundShare3(Difficulty) {Threshold = threshold};
 
             return title;
         }
@@ -61,6 +75,50 @@ namespace SimHopper
             {
                 poolServer.Value.Initialize(-1);
             }
+        }
+
+        public void FinishGeneration(List<RoundResult> results)
+        {
+            double propEarn = 0.0;
+            int propTotalShare = 0;
+            double pplnsEarn = 0.0;
+            int pplnsTotalShare = 0;
+
+            double scoreEarn = 0.0;
+            int scoreTotalShare = 0;
+
+            double pps = 50.0f / Difficulty;
+            long totalShare = 0;
+
+            foreach (var roundResult in results)
+            {
+                switch (roundResult.Type)
+                {
+                    case PoolType.Prop:
+                    case PoolType.PropEarlyHop:
+                        propEarn += roundResult.Profit;
+                        propTotalShare += roundResult.ValidShare + roundResult.LostShare;
+                        break;
+
+                    case PoolType.Pplns:
+                        pplnsEarn += roundResult.Profit;
+                        pplnsTotalShare += roundResult.ValidShare + roundResult.LostShare;
+                        break;
+                    case PoolType.Score:
+                        scoreEarn += roundResult.Profit;
+                        scoreTotalShare += roundResult.ValidShare + roundResult.LostShare;
+                        break;
+                }
+            }
+
+            var smppsEarn = pps * Servers["smpps"].MyValidShare;
+            totalShare = propTotalShare + pplnsTotalShare + scoreTotalShare + (int)Servers["smpps"].MyValidShare;
+            var totalEff = 100.0*(propEarn + pplnsEarn + scoreEarn + smppsEarn)/(pps*totalShare);
+
+            ///
+
+            _statSummary.SetStat(_curGeneration - 1, 0, totalEff);
+            _statSummary.Dump();
         }
     }
 
@@ -110,6 +168,11 @@ namespace SimHopper
             {
                 poolServer.Value.Initialize(-1);
             }
+        }
+
+        public void FinishGeneration(List<RoundResult> results)
+        {
+
         }
     }
 
@@ -167,6 +230,11 @@ namespace SimHopper
                 poolServer.Value.Initialize(-1);
             }
         }
+
+        public void FinishGeneration(List<RoundResult> results)
+        {
+
+        }
     }
 
     public class BclcTestConfig : ISimConfig
@@ -186,7 +254,7 @@ namespace SimHopper
             MaxSimulationDay = 520;
             MaxSimulationRound = 170;
             MaxSimulationGeneration = 112;
-            InitialSimulationSpeedUp = 120000;
+            InitialSimulationSpeedUp = 1;
 
             Servers = new Dictionary<string, PoolServer>();
             Servers.Add("ideal1", new PoolServer("ideal1", PoolType.Prop, 1000, 0, 0.0f, targetHandler));
@@ -220,6 +288,11 @@ namespace SimHopper
             {
                 poolServer.Value.Initialize(-1);
             }
+        }
+
+        public void FinishGeneration(List<RoundResult> results)
+        {
+
         }
     }
 }

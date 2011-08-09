@@ -5,6 +5,63 @@ using System.Linq;
 
 namespace SimHopper
 {
+    public class StatSummary
+    {
+        public string StatName { get; private set; }
+
+        private double[,] _stats;
+        private List<string> _columns;
+        private List<string> _rows;
+
+        public StatSummary(string name, List<string> columns, List<string> rows)
+        {
+            StatName = name;
+
+            _stats = new double[rows.Count, columns.Count];
+            for (int i = 0; i < rows.Count;++i )
+            {
+                for (int j = 0; j < columns.Count; ++j)
+                {
+                    _stats[i, j] = 0;
+                }
+            }
+
+            _columns = columns;
+            _rows = rows;
+        }
+
+        public void SetStat(int row, int column, double value)
+        {
+            _stats[row, column] = value;
+        }
+
+        public void Dump()
+        {
+            string strSaveFilePath = "Summary_" + StatName + ".txt";
+            
+            var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
+
+            var colLine = "_";
+            for (int col = 0; col < _columns.Count;++col )
+            {
+                colLine += "\t" + _columns[col];
+            }
+            writer.WriteLine(colLine);
+
+            for (int row = 0;row<_rows.Count;++row)
+            {
+                colLine = _rows[row];
+                for (int col = 0; col < _columns.Count; ++col)
+                {
+                    colLine += "\t" + _stats[row, col];
+                }
+                writer.WriteLine(colLine);
+            }
+
+            writer.Close();
+        }
+    }
+
     public class StatElement
     {
         public StatElement(int day)
@@ -58,9 +115,41 @@ namespace SimHopper
         public double TotalHop { get; set; }
     }
 
+    public class StatPoolElement
+    {
+        public string PoolName;
+        public double MyTotalShare;
+        public double TotalRound;
+        public double Efficiency;
+        public double Profit;
+
+        private double _accumulated;
+
+        public StatPoolElement(string poolName, double myTotalShare, int totalRound, double efficiency, double profit)
+        {
+            PoolName = poolName;
+            MyTotalShare = myTotalShare;
+            TotalRound = totalRound;
+            Efficiency = efficiency;
+            Profit = profit;
+            _accumulated = 0;
+        }
+
+        public void AccumulatePoolValue(double myTotalShare, int totalRound, double efficiency, double profit)
+        {
+            MyTotalShare = (MyTotalShare*_accumulated + myTotalShare)/(_accumulated + 1);
+            TotalRound = (TotalRound*_accumulated + totalRound)/(_accumulated + 1);
+            Efficiency = (Efficiency*_accumulated + efficiency)/(_accumulated + 1);
+            Profit = (Profit*_accumulated + profit)/(_accumulated + 1);
+
+            _accumulated++;
+        }
+    }
+
     public class Stat
     {
         private StatElement[] _elements;
+        private Dictionary<string, StatPoolElement> _poolElements;
         private int[] _dayAccumulated;
 
         public Stat(int maxDay)
@@ -73,6 +162,8 @@ namespace SimHopper
                 _elements[i] = new StatElement(i);
                 _dayAccumulated[i]=0;
             }
+
+            _poolElements = new Dictionary<string, StatPoolElement>();
         }
 
         public void AddStat(StatElement e)
@@ -99,6 +190,18 @@ namespace SimHopper
             _dayAccumulated[day] = _dayAccumulated[day] + 1;
         }
 
+        public void AddPoolStat(string poolName, double myTotalShare, int totalRound, double efficiency, double profit)
+        {
+            if(_poolElements.ContainsKey(poolName))
+            {
+                _poolElements[poolName].AccumulatePoolValue(myTotalShare, totalRound, efficiency, profit);
+            }
+            else
+            {
+                _poolElements.Add(poolName, new StatPoolElement(poolName, myTotalShare, totalRound, efficiency, profit));
+            }
+        }
+
         public void Dump(string generationTitle, bool toAddSimulationTime)
         {
             string strSaveFilePath = "StatDump_" + generationTitle + ".txt";
@@ -107,7 +210,16 @@ namespace SimHopper
                 strSaveFilePath = "StatDump_" + generationTitle + string.Format("_{0:yyyyMMMdd-HHmmss}", DateTime.Now) + ".txt";
             }
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
-            
+
+            writer.WriteLine("Pool\tMyShare(Total)\tTotalRound\tEfficiency\tProfit");
+
+            foreach (var p in _poolElements)
+            {
+                writer.WriteLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}", p.Key, (int)p.Value.MyTotalShare, (int)p.Value.TotalRound, p.Value.Efficiency, p.Value.Profit));
+            }
+
+            writer.WriteLine("\n");
+
             writer.WriteLine("day\tprop eff\tprop earn\tscore eff\tscore earn\tpplns eff\tpplns earn\tpps earn\ttot eff\ttot earn\tHops");
 
             var maxAccumulation = 0;

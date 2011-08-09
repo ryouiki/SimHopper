@@ -32,5 +32,6 @@ namespace SimHopper
 
         void InitializeServers();
         string SetupGeneration(int generation);
+        void FinishGeneration(List<RoundResult> results);
     }
 }

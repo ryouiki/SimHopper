@@ -49,7 +49,8 @@ namespace SimHopper
             // Simulation Configuration Here //
             //
             //
-            _simConfig = new SlushTestConfig2(GetNextTarget);
+            //_simConfig = new SlushTestConfig2(GetNextTarget);
+            _simConfig = new BasicSimConfig(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -74,6 +75,7 @@ namespace SimHopper
         {
             if (_currentSimGeneration < _simConfig.MaxSimulationGeneration)
             {
+                _simConfig.FinishGeneration(_results);
                 SetupGeneration();
             }
             else
@@ -221,24 +223,6 @@ namespace SimHopper
                 labelPoolInfo.Text = string.Format("SMPPS my share : {0} / {1}rejected", (int)pool.MyValidShare, (int)pool.MyLostShare);
             }
 
-            dataGridPools.Rows.Clear();
-            foreach (var server in _simConfig.Servers)
-            {
-                double eff = 0;
-                if (server.Value.MyTotalShare>0)
-                {
-                    eff = 100*(server.Value.MyTotalProfit/server.Value.MyTotalShare)/pps;
-                }
-                var progress = string.Format("{0}% {1}", (int) (server.Value.CurrentShare/_simConfig.Difficulty*100),
-                                             server.Value.CurrentShare);
-
-                dataGridPools.Rows.Add(server.Key, (int)server.Value.MyValidShare, progress,
-                                       server.Value.RoundTime,
-                                       string.Format("{0:0.00}", eff),
-                                       server.Value.MyTotalProfit);
-            }
-
-
             // print earn / eff
             double propEarn = 0.0;
             int propTotalShare = 0;
@@ -319,12 +303,52 @@ namespace SimHopper
                                        totalEff, totalEarn, _totalHop);
             _stat.AddStat(stat);
 
+            // datagrid pools
+            dataGridPools.Rows.Clear();
+            foreach (var server in _simConfig.Servers)
+            {
+                if(server.Key=="smpps")
+                {
+                    dataGridPools.Rows.Add(server.Key, (int)server.Value.MyValidShare,
+                        "N/A","N/A","N/A","100%",smppsEarn);
+                }
+                else
+                {
+                    double eff = 0;
+                    if (server.Value.MyTotalShare > 0)
+                    {
+                        eff = 100 * (server.Value.MyTotalProfit / server.Value.MyTotalShare) / pps;
+                    }
+                    var progressDelayed = string.Format("{0}% {1}", (int)(server.Value.CurrentShare / _simConfig.Difficulty * 100),
+                                                 server.Value.CurrentShare);
+                    var progressReal = string.Format("{0}% {1}", (int)(server.Value.CurrentRealShare / _simConfig.Difficulty * 100),
+                                                 server.Value.CurrentRealShare);
+
+                    dataGridPools.Rows.Add(server.Key, (int)server.Value.MyValidShare, progressDelayed, progressReal,
+                                           server.Value.RealRoundTime,
+                                           string.Format("{0:0.00}", eff),
+                                           server.Value.MyTotalProfit);                   
+                }
+            }
+
             if (days > _simConfig.MaxSimulationDay)
             {
                 if (_toLog)
                 {
                     var log = string.Format("{0:0.0} / {1:0.0} / {2:0.0} : / {3:0.0} | {4:0.000} BTC/day\n", propEff, pplnsEff, scoreEff, totalEff, totalEarn / (_elapsedTime / 86400.0));
                     PrintLog(log);
+                    foreach (var p in _simConfig.Servers)
+                    {
+                        if(p.Key=="smpps")
+                        {
+                            _stat.AddPoolStat("smpps", p.Value.MyValidShare, 0, 1, pps * p.Value.MyValidShare);
+                        }
+                        else
+                        {
+                            _stat.AddPoolStat(p.Key, p.Value.MyTotalShare, p.Value.Round, (p.Value.MyTotalProfit / p.Value.MyTotalShare) / pps, p.Value.MyTotalProfit);
+                        }
+                    }
+
                     _stat.Dump(_currentGenerationTitle, false);
                     _toLog = false;
                 }
@@ -339,6 +363,17 @@ namespace SimHopper
                     }
                     else
                     {
+                        foreach (var p in _simConfig.Servers)
+                        {
+                            if (p.Key == "smpps")
+                            {
+                                _stat.AddPoolStat("smpps", p.Value.MyValidShare, 0, 1, pps * p.Value.MyValidShare);
+                            }
+                            else
+                            {
+                                _stat.AddPoolStat(p.Key, p.Value.MyTotalShare, p.Value.Round, (p.Value.MyTotalProfit / p.Value.MyTotalShare) / pps, p.Value.MyTotalProfit);
+                            }
+                        }
                         _stat.Dump(_currentGenerationTitle, true);
                         FinishSimGeneration();
                     }
