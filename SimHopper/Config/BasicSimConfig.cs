@@ -64,7 +64,7 @@ namespace SimHopper
             var threshold = 0.235f + 0.005f * generation;
             var title = string.Format("{0}{1:0.000}", _statSummary.StatName, threshold);
 
-            Strategy = new MinRoundShare3(Difficulty) {Threshold = threshold};
+            Strategy = new MinRoundShare(Difficulty) {Threshold = threshold};
 
             return title;
         }
@@ -122,60 +122,6 @@ namespace SimHopper
         }
     }
 
-    public class SlushTestConfig : ISimConfig
-    {
-        public int Difficulty { get; private set; }
-        public int MaxSimulationDay { get; private set; }
-        public int MaxSimulationRound { get; private set; }
-        public int MaxSimulationGeneration { get; private set; }
-        public int InitialSimulationSpeedUp { get; private set; }
-
-        public Dictionary<string, PoolServer> Servers { get; private set; }
-        public IHopStrategy Strategy { get; private set; }
-
-        public SlushTestConfig(GetTargetShareHandler targetHandler)
-        {
-            Difficulty = 1888786;
-            MaxSimulationDay = 520;
-            MaxSimulationRound = 150;
-            MaxSimulationGeneration = 140;
-            InitialSimulationSpeedUp = 120000;
-
-            Servers = new Dictionary<string, PoolServer>();
-            Servers.Add("ideal", new PoolServer("ideal", PoolType.Prop, 1000, 0, 0.0f, targetHandler));
-            Servers.Add("slush", new PoolServer("slush", PoolType.Score, 2000, 60, 8.13f, targetHandler));
-
-            //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
-            Servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, 0, 0.0f, targetHandler));
-        }
-
-        public string SetupGeneration(int generation)
-        {
-            var x = generation%14 + 1;
-            var y = (int) (generation/14) + 1;
-            var protectProp = 0.15 + 0.02 * x;
-            var scoreFactor = 1.5 + 0.3 * y;
-            var title = string.Format("{0}{1:0.00}-{2:0.00}", "slushTest", protectProp, scoreFactor);
-
-            Strategy = new MinRoundShare2(Difficulty) { ScoreFactor = scoreFactor, ProtectProp = protectProp };
-
-            return title;
-        }
-
-        public void InitializeServers()
-        {
-            foreach (var poolServer in Servers)
-            {
-                poolServer.Value.Initialize(-1);
-            }
-        }
-
-        public void FinishGeneration(List<RoundResult> results)
-        {
-
-        }
-    }
-
     public class SlushTestConfig2 : ISimConfig
     {
         public int Difficulty { get; private set; }
@@ -218,7 +164,7 @@ namespace SimHopper
 
             var title = string.Format("{0}{1:0.00}-{2:0.00}", "rs3_slush", baseProgress, penaltyFactor);
 
-            Strategy = new MinRoundShare3(Difficulty);
+            Strategy = new MinRoundShare(Difficulty);
 
             return title;
         }
@@ -277,7 +223,7 @@ namespace SimHopper
 
             var title = string.Format("{0}{1:0.00}-{2:0.00}", "rs3_bclc", baseProgress, penaltyFactor);
 
-            Strategy = new MinRoundShare3(Difficulty);
+            Strategy = new MinRoundShare(Difficulty);
 
             return title;
         }
