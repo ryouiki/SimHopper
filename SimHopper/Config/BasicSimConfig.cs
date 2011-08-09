@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SimHopper
 {
@@ -55,7 +56,6 @@ namespace SimHopper
                 rows.Add(threshold.ToString());
             }
             _statSummary = new StatSummary("minRS3", columns, rows);
-
         }
 
         public string SetupGeneration(int generation)
@@ -77,52 +77,14 @@ namespace SimHopper
             }
         }
 
-        public void FinishGeneration(List<RoundResult> results)
+        public void FinishGeneration(Stat stat)
         {
-            double propEarn = 0.0;
-            int propTotalShare = 0;
-            double pplnsEarn = 0.0;
-            int pplnsTotalShare = 0;
-
-            double scoreEarn = 0.0;
-            int scoreTotalShare = 0;
-
-            double pps = 50.0f / Difficulty;
-            long totalShare = 0;
-
-            foreach (var roundResult in results)
-            {
-                switch (roundResult.Type)
-                {
-                    case PoolType.Prop:
-                    case PoolType.PropEarlyHop:
-                        propEarn += roundResult.Profit;
-                        propTotalShare += roundResult.ValidShare + roundResult.LostShare;
-                        break;
-
-                    case PoolType.Pplns:
-                        pplnsEarn += roundResult.Profit;
-                        pplnsTotalShare += roundResult.ValidShare + roundResult.LostShare;
-                        break;
-                    case PoolType.Score:
-                        scoreEarn += roundResult.Profit;
-                        scoreTotalShare += roundResult.ValidShare + roundResult.LostShare;
-                        break;
-                }
-            }
-
-            var smppsEarn = pps * Servers["smpps"].MyValidShare;
-            totalShare = propTotalShare + pplnsTotalShare + scoreTotalShare + (int)Servers["smpps"].MyValidShare;
-            var totalEff = 100.0*(propEarn + pplnsEarn + scoreEarn + smppsEarn)/(pps*totalShare);
-
-            ///
-
-            _statSummary.SetStat(_curGeneration - 1, 0, totalEff);
+            _statSummary.SetStat(_curGeneration - 1, 0, stat.GetLastDay().TotalEff);
             _statSummary.Dump();
         }
     }
 
-    public class SlushTestConfig2 : ISimConfig
+    public class SlushTestConfig : ISimConfig
     {
         public int Difficulty { get; private set; }
         public int MaxSimulationDay { get; private set; }
@@ -133,12 +95,14 @@ namespace SimHopper
         public Dictionary<string, PoolServer> Servers { get; private set; }
         public IHopStrategy Strategy { get; private set; }
 
-        public SlushTestConfig2(GetTargetShareHandler targetHandler)
+        private StatSummary _statSummary;
+        private int _curGeneration;
+
+        public SlushTestConfig(GetTargetShareHandler targetHandler)
         {
             Difficulty = 1888786;
             MaxSimulationDay = 520;
             MaxSimulationRound = 150;
-            MaxSimulationGeneration = 112;
             InitialSimulationSpeedUp = 120000;
 
             Servers = new Dictionary<string, PoolServer>();
@@ -151,18 +115,38 @@ namespace SimHopper
 
             //_servers.Add("mineco.in", new PoolServer("mineco.in", PoolType.Pplns, 150, -1, 60, 7.34f, GetNextTarget));
             Servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, 0, 0.0f, targetHandler));
+
+            var MaxCol = 8;
+            var columns = new List<string>();
+            for (int col = 0; col < MaxCol; ++col)
+            {
+                var penaltyFactor = 2.2 + 0.4 * col;
+                columns.Add(penaltyFactor.ToString());
+            }
+
+            var MaxRow = 14;
+            var rows = new List<string>();
+            for (int row = 0; row < MaxRow; ++row)
+            {
+                var baseProgress = 0.13 + 0.02 * row;
+                rows.Add(baseProgress.ToString());
+            }
+
+            MaxSimulationGeneration = MaxCol * MaxRow;
+            _statSummary = new StatSummary("i5_slush", columns, rows);
         }
 
         public string SetupGeneration(int generation)
         {
-            var x = (int)(generation / 8) + 1;
-            var y = generation % 8;
-            var baseProgress = 0.13 + 0.02 * x;
-            var penaltyFactor = 1.8 + 0.4 * y;
-            Servers["slush"].BaseProgress = (float)baseProgress;
-            Servers["slush"].PenaltyFactor = (float)penaltyFactor;
+            _curGeneration = generation;
+            var x = (generation - 1) / _statSummary.Columns.Count;
+            var y = (generation - 1)%_statSummary.Columns.Count;
 
-            var title = string.Format("{0}{1:0.00}-{2:0.00}", "rs3_slush", baseProgress, penaltyFactor);
+            Servers["slush"].BaseProgress = (float)Convert.ToDouble(_statSummary.Rows[x]);
+            Servers["slush"].PenaltyFactor = (float)Convert.ToDouble(_statSummary.Columns[y]);
+
+            var title = string.Format("{0}{1:0.00}-{2:0.00}", _statSummary.StatName,
+                Servers["slush"].BaseProgress, Servers["slush"].PenaltyFactor);
 
             Strategy = new MinRoundShare(Difficulty);
 
@@ -177,9 +161,14 @@ namespace SimHopper
             }
         }
 
-        public void FinishGeneration(List<RoundResult> results)
+        public void FinishGeneration(Stat stat)
         {
+            ///
+            var x = (_curGeneration - 1) / _statSummary.Columns.Count;
+            var y = (_curGeneration-1) % _statSummary.Columns.Count;
 
+            _statSummary.SetStat(x, y, stat.GetLastDay().TotalEff);
+            _statSummary.Dump();
         }
     }
 
@@ -236,7 +225,7 @@ namespace SimHopper
             }
         }
 
-        public void FinishGeneration(List<RoundResult> results)
+        public void FinishGeneration(Stat stat)
         {
 
         }

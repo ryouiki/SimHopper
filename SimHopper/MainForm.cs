@@ -49,8 +49,8 @@ namespace SimHopper
             // Simulation Configuration Here //
             //
             //
-            //_simConfig = new SlushTestConfig2(GetNextTarget);
-            _simConfig = new BasicSimConfig(GetNextTarget);
+            _simConfig = new SlushTestConfig(GetNextTarget);
+            //_simConfig = new BasicSimConfig(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -73,9 +73,9 @@ namespace SimHopper
 
         public void FinishSimGeneration()
         {
+            _simConfig.FinishGeneration(_stat);
             if (_currentSimGeneration < _simConfig.MaxSimulationGeneration)
             {
-                _simConfig.FinishGeneration(_results);
                 SetupGeneration();
             }
             else

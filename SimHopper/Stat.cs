@@ -8,10 +8,10 @@ namespace SimHopper
     public class StatSummary
     {
         public string StatName { get; private set; }
+        public List<string> Columns { get; private set; }
+        public List<string> Rows { get; private set; }
 
         private double[,] _stats;
-        private List<string> _columns;
-        private List<string> _rows;
 
         public StatSummary(string name, List<string> columns, List<string> rows)
         {
@@ -26,8 +26,8 @@ namespace SimHopper
                 }
             }
 
-            _columns = columns;
-            _rows = rows;
+            Columns = columns;
+            Rows = rows;
         }
 
         public void SetStat(int row, int column, double value)
@@ -42,16 +42,16 @@ namespace SimHopper
             var writer = new StreamWriter(strSaveFilePath, false, System.Text.Encoding.UTF8);
 
             var colLine = "_";
-            for (int col = 0; col < _columns.Count;++col )
+            for (int col = 0; col < Columns.Count;++col )
             {
-                colLine += "\t" + _columns[col];
+                colLine += "\t" + Columns[col];
             }
             writer.WriteLine(colLine);
 
-            for (int row = 0;row<_rows.Count;++row)
+            for (int row = 0;row<Rows.Count;++row)
             {
-                colLine = _rows[row];
-                for (int col = 0; col < _columns.Count; ++col)
+                colLine = Rows[row];
+                for (int col = 0; col < Columns.Count; ++col)
                 {
                     colLine += "\t" + _stats[row, col];
                 }
@@ -164,6 +164,24 @@ namespace SimHopper
             }
 
             _poolElements = new Dictionary<string, StatPoolElement>();
+        }
+
+        public StatElement GetLastDay()
+        {
+            var maxAccumulation = 0;
+            foreach (var acc in _dayAccumulated.Where(acc => maxAccumulation < acc))
+            {
+                maxAccumulation = acc;
+            }
+
+            for (int i = _elements.Length-1; i >0;--i )
+            {
+                if (_dayAccumulated[i] < maxAccumulation * 0.5)
+                    continue;
+                return _elements[i];
+            }
+
+            return null;
         }
 
         public void AddStat(StatElement e)

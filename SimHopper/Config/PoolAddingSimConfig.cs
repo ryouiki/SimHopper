@@ -66,7 +66,7 @@ namespace SimHopper
             }
         }
 
-        public void FinishGeneration(List<RoundResult> results)
+        public void FinishGeneration(Stat stat)
         {
 
         }
