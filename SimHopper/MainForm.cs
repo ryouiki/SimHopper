@@ -49,8 +49,9 @@ namespace SimHopper
             // Simulation Configuration Here //
             //
             //
-            _simConfig = new BclcTest(GetNextTarget);
-            //_simConfig = new BasicSimConfig(GetNextTarget);
+            _simConfig = new BasicSimConfig(GetNextTarget);
+            //_simConfig = new BclcTest(GetNextTarget);
+            //_simConfig = new MinecoTest(GetNextTarget);
 
             labelAdvPerTick.Text = _simConfig.InitialSimulationSpeedUp.ToString();
 
@@ -288,7 +289,10 @@ namespace SimHopper
 
             totalShare = propTotalShare + pplnsTotalShare + scoreTotalShare + (int)_simConfig.Servers["smpps"].MyValidShare;
 
-            var totalEff = 100.0*(propEarn + pplnsEarn + scoreEarn + smppsEarn)/(pps*totalShare);
+            double totalEff = 0;
+            if (totalShare>0)
+                totalEff = 100.0 * (propEarn + pplnsEarn + scoreEarn + smppsEarn) / (pps * totalShare);
+            
             labelTotalEff.Text = string.Format("Total Eff : {1} share - {0:0.00}%", totalEff, totalShare);
 
             if (days > 0)
