@@ -228,7 +228,7 @@ namespace SimHopper
                     }
                     else
                     {
-                        MyLostShare += myShare;
+                        MyLostShare += myShare + myLost;
                     }
                     break;
                 case PoolType.Prop:
