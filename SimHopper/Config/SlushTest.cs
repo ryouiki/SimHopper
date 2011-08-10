@@ -39,20 +39,20 @@ namespace SimHopper
             var columns = new List<string>();
             for (int col = 0; col < MaxCol; ++col)
             {
-                var penaltyFactor = 2.2 + 0.4 * col;
+                var penaltyFactor = 3.4 + 0.2 * col;
                 columns.Add(penaltyFactor.ToString());
             }
 
-            var MaxRow = 6;
+            var MaxRow = 10;
             var rows = new List<string>();
             for (int row = 0; row < MaxRow; ++row)
             {
-                var baseProgress = 0.11 - 0.02 * row;
+                var baseProgress = 0.01 * row;
                 rows.Add(baseProgress.ToString());
             }
 
             MaxSimulationGeneration = MaxCol * MaxRow;
-            _statSummary = new StatSummary("slush2", columns, rows);
+            _statSummary = new StatSummary("slush3", columns, rows);
         }
 
         public string SetupGeneration(int generation)
@@ -91,7 +91,7 @@ namespace SimHopper
         }
     }
 
-    public class MincoTest : ISimConfig
+    public class MinecoTest : ISimConfig
     {
         public int Difficulty { get; private set; }
         public int MaxSimulationDay { get; private set; }
@@ -105,12 +105,12 @@ namespace SimHopper
         private StatSummary _statSummary;
         private int _curGeneration;
 
-        public MincoTest(GetTargetShareHandler targetHandler)
+        public MinecoTest(GetTargetShareHandler targetHandler)
         {
             Difficulty = 1888786;
             MaxSimulationDay = 520;
             MaxSimulationRound = 150;
-            InitialSimulationSpeedUp = 120000;
+            InitialSimulationSpeedUp = 1;
 
             Servers = new Dictionary<string, PoolServer>();
             //Servers.Add("ideal1", new PoolServer("ideal1", PoolType.Prop, 1000, 0, 0.0f, targetHandler));
@@ -123,11 +123,11 @@ namespace SimHopper
             Servers.Add("mineco", new PoolServer("mineco.in", PoolType.Pplns, 150, 180, 7.34f, targetHandler));
             Servers.Add("smpps", new PoolServer("smpps", PoolType.Smpps, 20, 0, 0.0f, targetHandler));
 
-            var MaxCol = 12;
+            var MaxCol = 15;
             var columns = new List<string>();
             for (int col = 0; col < MaxCol; ++col)
             {
-                var penaltyFactor = 1.2 + 0.4 * col;
+                var penaltyFactor = 1.0 + 0.2 * col;
                 columns.Add(penaltyFactor.ToString());
             }
 
