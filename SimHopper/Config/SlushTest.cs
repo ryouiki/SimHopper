@@ -110,7 +110,7 @@ namespace SimHopper
             Difficulty = 1888786;
             MaxSimulationDay = 520;
             MaxSimulationRound = 150;
-            InitialSimulationSpeedUp = 1;
+            InitialSimulationSpeedUp = 160000;
 
             Servers = new Dictionary<string, PoolServer>();
             //Servers.Add("ideal1", new PoolServer("ideal1", PoolType.Prop, 1000, 0, 0.0f, targetHandler));
