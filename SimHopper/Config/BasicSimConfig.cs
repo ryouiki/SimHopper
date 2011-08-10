@@ -55,14 +55,14 @@ namespace SimHopper
                 var threshold = 0.235f + 0.005f*g;
                 rows.Add(threshold.ToString());
             }
-            _statSummary = new StatSummary("minRS3", columns, rows);
+            _statSummary = new StatSummary("minRS", columns, rows);
         }
 
         public string SetupGeneration(int generation)
         {
             _curGeneration = generation;
             var threshold = 0.235f + 0.005f * generation;
-            var title = string.Format("{0}{1:0.000}", _statSummary.StatName, threshold);
+            var title = string.Format("{0}-{1:0.000}", _statSummary.StatName, threshold);
 
             Strategy = new MinRoundShare(Difficulty) {Threshold = threshold};
 
