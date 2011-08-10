@@ -412,9 +412,21 @@ namespace SimHopper
             labelAdvPerTick.Text = _advPerTick.ToString();
         }
 
-        private void buttonRestart_Click(object sender, EventArgs e)
+        private void buttonRound_Click(object sender, EventArgs e)
         {
             SetupRound();
+        }
+
+        private void checkBoxAuto_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBoxAuto.Checked)
+            {
+                buttonRound.Enabled = false;
+            }
+            else
+            {
+                buttonRound.Enabled = true;
+            }
         }
     }
 

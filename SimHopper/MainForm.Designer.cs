@@ -46,7 +46,7 @@
             this.labelTotalEff = new System.Windows.Forms.Label();
             this.labelScoreEarn = new System.Windows.Forms.Label();
             this.labelScoreEff = new System.Windows.Forms.Label();
-            this.buttonRestart = new System.Windows.Forms.Button();
+            this.buttonRound = new System.Windows.Forms.Button();
             this.textBoxLog = new System.Windows.Forms.TextBox();
             this.checkBoxAuto = new System.Windows.Forms.CheckBox();
             this.labelSimulRound = new System.Windows.Forms.Label();
@@ -143,7 +143,7 @@
             // labelAdvPerTick
             // 
             this.labelAdvPerTick.AutoSize = true;
-            this.labelAdvPerTick.Location = new System.Drawing.Point(388, 235);
+            this.labelAdvPerTick.Location = new System.Drawing.Point(526, 235);
             this.labelAdvPerTick.Name = "labelAdvPerTick";
             this.labelAdvPerTick.Size = new System.Drawing.Size(29, 12);
             this.labelAdvPerTick.TabIndex = 4;
@@ -151,7 +151,7 @@
             // 
             // buttonSpeedDown
             // 
-            this.buttonSpeedDown.Location = new System.Drawing.Point(342, 229);
+            this.buttonSpeedDown.Location = new System.Drawing.Point(480, 229);
             this.buttonSpeedDown.Name = "buttonSpeedDown";
             this.buttonSpeedDown.Size = new System.Drawing.Size(40, 24);
             this.buttonSpeedDown.TabIndex = 5;
@@ -161,7 +161,7 @@
             // 
             // buttonSpeedUp
             // 
-            this.buttonSpeedUp.Location = new System.Drawing.Point(432, 229);
+            this.buttonSpeedUp.Location = new System.Drawing.Point(570, 229);
             this.buttonSpeedUp.Name = "buttonSpeedUp";
             this.buttonSpeedUp.Size = new System.Drawing.Size(40, 24);
             this.buttonSpeedUp.TabIndex = 6;
@@ -172,7 +172,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(364, 214);
+            this.label1.Location = new System.Drawing.Point(502, 214);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(52, 12);
             this.label1.TabIndex = 7;
@@ -214,15 +214,16 @@
             this.labelScoreEff.TabIndex = 11;
             this.labelScoreEff.Text = "Score Eff : ";
             // 
-            // buttonRestart
+            // buttonRound
             // 
-            this.buttonRestart.Location = new System.Drawing.Point(341, 95);
-            this.buttonRestart.Name = "buttonRestart";
-            this.buttonRestart.Size = new System.Drawing.Size(131, 23);
-            this.buttonRestart.TabIndex = 12;
-            this.buttonRestart.Text = "Restart";
-            this.buttonRestart.UseVisualStyleBackColor = true;
-            this.buttonRestart.Click += new System.EventHandler(this.buttonRestart_Click);
+            this.buttonRound.Enabled = false;
+            this.buttonRound.Location = new System.Drawing.Point(479, 173);
+            this.buttonRound.Name = "buttonRound";
+            this.buttonRound.Size = new System.Drawing.Size(131, 23);
+            this.buttonRound.TabIndex = 12;
+            this.buttonRound.Text = "One Round";
+            this.buttonRound.UseVisualStyleBackColor = true;
+            this.buttonRound.Click += new System.EventHandler(this.buttonRound_Click);
             // 
             // textBoxLog
             // 
@@ -241,17 +242,18 @@
             this.checkBoxAuto.AutoSize = true;
             this.checkBoxAuto.Checked = true;
             this.checkBoxAuto.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxAuto.Location = new System.Drawing.Point(349, 78);
+            this.checkBoxAuto.Location = new System.Drawing.Point(480, 151);
             this.checkBoxAuto.Name = "checkBoxAuto";
             this.checkBoxAuto.Size = new System.Drawing.Size(75, 16);
             this.checkBoxAuto.TabIndex = 14;
             this.checkBoxAuto.Text = "Auto Run";
             this.checkBoxAuto.UseVisualStyleBackColor = true;
+            this.checkBoxAuto.CheckedChanged += new System.EventHandler(this.checkBoxAuto_CheckedChanged);
             // 
             // labelSimulRound
             // 
             this.labelSimulRound.AutoSize = true;
-            this.labelSimulRound.Location = new System.Drawing.Point(347, 63);
+            this.labelSimulRound.Location = new System.Drawing.Point(477, 127);
             this.labelSimulRound.Name = "labelSimulRound";
             this.labelSimulRound.Size = new System.Drawing.Size(114, 12);
             this.labelSimulRound.TabIndex = 15;
@@ -269,7 +271,7 @@
             // labelGeneration
             // 
             this.labelGeneration.AutoSize = true;
-            this.labelGeneration.Location = new System.Drawing.Point(347, 48);
+            this.labelGeneration.Location = new System.Drawing.Point(477, 112);
             this.labelGeneration.Name = "labelGeneration";
             this.labelGeneration.Size = new System.Drawing.Size(94, 12);
             this.labelGeneration.TabIndex = 17;
@@ -373,7 +375,7 @@
             this.Controls.Add(this.labelSimulRound);
             this.Controls.Add(this.checkBoxAuto);
             this.Controls.Add(this.textBoxLog);
-            this.Controls.Add(this.buttonRestart);
+            this.Controls.Add(this.buttonRound);
             this.Controls.Add(this.labelScoreEff);
             this.Controls.Add(this.labelScoreEarn);
             this.Controls.Add(this.labelTotalEff);
@@ -417,7 +419,7 @@
         private System.Windows.Forms.Label labelTotalEff;
         private System.Windows.Forms.Label labelScoreEarn;
         private System.Windows.Forms.Label labelScoreEff;
-        private System.Windows.Forms.Button buttonRestart;
+        private System.Windows.Forms.Button buttonRound;
         private System.Windows.Forms.TextBox textBoxLog;
         private System.Windows.Forms.CheckBox checkBoxAuto;
         private System.Windows.Forms.Label labelSimulRound;
